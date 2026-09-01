@@ -1,0 +1,38 @@
+{
+  "exercise_schema_version": 1,
+  "id": "ai_pointers_20260827_093510_fac868",
+  "topic": "pointers",
+  "title": "Keep the Dispatch Tracker on the Active Call",
+  "difficulty": "medium",
+  "type": "fix_code",
+  "scenario": "A city emergency dispatcher keeps several live EmergencyCall records open during a shift. DispatchTracker is a screen component that observes one currently watched call while the dispatcher continues updating those call records.",
+  "problem_statement": "`DispatchTracker::beginWatching`, `DispatchTracker::switchTo`, and `DispatchTracker::clear` currently leave the tracker in the wrong state. Repair these operations so the tracker can begin watching a call, switch from one existing call to another, and return to its empty state. When a dispatcher updates the location of the watched `EmergencyCall`, `watchedLocation()` must report that call's current location.",
+  "constraints": [
+    "Do not change the public methods of `EmergencyCall` or `DispatchTracker`.",
+    "The dispatcher keeps every EmergencyCall used by DispatchTracker alive for the entire operation.",
+    "DispatchTracker watches at most one EmergencyCall at a time.",
+    "An empty tracker must continue returning \"No active call\" from watchedLocation()."
+  ],
+  "learning_objective": "Use a raw non-owning pointer member with null, binding, and reseating states, while safely reading the current state of the live pointee through a null-aware query.",
+  "instructions": "Update the three DispatchTracker operations that manage the watched call. Keep the existing query methods and their empty-state behavior intact.",
+  "starter_code": "#include <string>\n\nclass EmergencyCall {\npublic:\n    EmergencyCall(std::string incident, std::string location)\n        : incident_(incident), location_(location) {}\n\n    void updateLocation(const std::string& newLocation) {\n        location_ = newLocation;\n    }\n\n    const std::string& incident() const {\n        return incident_;\n    }\n\n    const std::string& location() const {\n        return location_;\n    }\n\nprivate:\n    std::string incident_;\n    std::string location_;\n};\n\nclass DispatchTracker {\npublic:\n    DispatchTracker() : watched_(nullptr) {}\n\n    void beginWatching(EmergencyCall& call) {\n        watched_ = nullptr;\n    }\n\n    void switchTo(EmergencyCall& call) {\n        watched_ = watched_;\n    }\n\n    void clear() {\n        watched_ = watched_;\n    }\n\n    bool isWatching() const {\n        return watched_ != nullptr;\n    }\n\n    std::string watchedLocation() const {\n        return watched_ == nullptr ? \"No active call\" : watched_->location();\n    }\n\nprivate:\n    EmergencyCall* watched_;\n};\n",
+  "reference_solution": "#include <string>\n\nclass EmergencyCall {\npublic:\n    EmergencyCall(std::string incident, std::string location)\n        : incident_(incident), location_(location) {}\n\n    void updateLocation(const std::string& newLocation) {\n        location_ = newLocation;\n    }\n\n    const std::string& incident() const {\n        return incident_;\n    }\n\n    const std::string& location() const {\n        return location_;\n    }\n\nprivate:\n    std::string incident_;\n    std::string location_;\n};\n\nclass DispatchTracker {\npublic:\n    DispatchTracker() : watched_(nullptr) {}\n\n    void beginWatching(EmergencyCall& call) {\n        watched_ = &call;\n    }\n\n    void switchTo(EmergencyCall& call) {\n        watched_ = &call;\n    }\n\n    void clear() {\n        watched_ = nullptr;\n    }\n\n    bool isWatching() const {\n        return watched_ != nullptr;\n    }\n\n    std::string watchedLocation() const {\n        return watched_ == nullptr ? \"No active call\" : watched_->location();\n    }\n\nprivate:\n    EmergencyCall* watched_;\n};\n",
+  "expected_concepts": [
+    "raw non-owning pointer member",
+    "null pointer state",
+    "binding a pointer to an existing object",
+    "reseating a pointer to a different existing object",
+    "dereference-based read access",
+    "pointee identity"
+  ],
+  "concept_checks": [],
+  "hidden_test_file": "tests/ai_pointers_20260827_093510_fac868_tests.cpp",
+  "trace_mode": "runtime",
+  "hints": [
+    "The tracker needs to remember which already-existing call is currently being watched.",
+    "Changing the watched call should replace the earlier selection rather than preserve it.",
+    "Consider what state represents a tracker that has no active call."
+  ],
+  "explanation": "DispatchTracker stores the identity of the currently watched EmergencyCall. Beginning or switching observation stores the address of the selected live call, while clearing removes that association. The existing null check in watchedLocation() keeps the empty state safe. Because the tracker observes the original call object, later location updates are visible through the tracker.",
+  "learner_goal": "Make the dispatch screen follow the current location of the selected emergency call, change cleanly to another call, and show no active call after it is cleared."
+}

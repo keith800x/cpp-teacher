@@ -1,0 +1,25 @@
+{
+  "id": "unique_ptr_001",
+  "topic": "unique_ptr",
+  "title": "Transfer Ownership",
+  "difficulty": 1,
+  "type": "fix_code",
+  "learning_objective": "Understand that std::unique_ptr ownership is transferred rather than copied.",
+  "instructions": "Fix the code so ownership of the Player object is transferred from player to second.",
+  "starter_code": "#include <memory>\n\nstruct Player\n{\n};\n\nint main()\n{\n    auto player = std::make_unique<Player>();\n    auto second = player;\n\n    return 0;\n}",
+  "reference_solution": "#include <memory>\n#include <utility>\n\nstruct Player\n{\n};\n\nint main()\n{\n    auto player = std::make_unique<Player>();\n    auto second = std::move(player);\n\n    return 0;\n}",
+  "expected_concepts": [
+    "unique_ptr",
+    "std::move",
+    "ownership_transfer"
+  ],
+  "required_code_fragments": [
+    "std::move"
+  ],
+  "hints": [
+    "A std::unique_ptr cannot be copied.",
+    "Ownership needs to move from player to second.",
+    "Use std::move to transfer ownership."
+  ],
+  "explanation": "This older exercise still uses the legacy string-fragment check. We will migrate std::move to AST analysis after the basic AST infrastructure is proven."
+}

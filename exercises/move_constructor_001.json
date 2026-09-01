@@ -1,0 +1,29 @@
+{
+  "id": "move_constructor_001",
+  "topic": "copy_move",
+  "title": "Implement a Move Constructor",
+  "difficulty": 3,
+  "type": "implement_class_member",
+  "learning_objective": "Implement a noexcept move constructor that transfers heap ownership and leaves the source empty.",
+  "instructions": "Add a noexcept move constructor to Buffer. Transfer data_ and set the source pointer to nullptr. Submit the complete Buffer class only; do not add main().",
+  "starter_code": "class Buffer\n{\npublic:\n    explicit Buffer(int value)\n        : data_(new int(value))\n    {\n    }\n\n    Buffer(const Buffer&) = delete;\n    Buffer& operator=(const Buffer&) = delete;\n\n    ~Buffer()\n    {\n        delete data_;\n    }\n\n    bool empty() const\n    {\n        return data_ == nullptr;\n    }\n\n    int value() const\n    {\n        return data_ ? *data_ : 0;\n    }\n\nprivate:\n    int* data_;\n};",
+  "reference_solution": "class Buffer\n{\npublic:\n    explicit Buffer(int value)\n        : data_(new int(value))\n    {\n    }\n\n    Buffer(const Buffer&) = delete;\n    Buffer& operator=(const Buffer&) = delete;\n\n    Buffer(Buffer&& other) noexcept\n        : data_(other.data_)\n    {\n        other.data_ = nullptr;\n    }\n\n    ~Buffer()\n    {\n        delete data_;\n    }\n\n    bool empty() const\n    {\n        return data_ == nullptr;\n    }\n\n    int value() const\n    {\n        return data_ ? *data_ : 0;\n    }\n\nprivate:\n    int* data_;\n};",
+  "expected_concepts": [
+    "move_constructor",
+    "ownership_transfer",
+    "rvalue_reference"
+  ],
+  "concept_checks": [
+    {
+      "type": "move_constructor",
+      "class": "Buffer"
+    }
+  ],
+  "hidden_test_file": "tests/move_constructor_001_tests.cpp",
+  "hints": [
+    "A move constructor takes Buffer&&.",
+    "Transfer other.data_ instead of allocating a replacement.",
+    "Set other.data_ to nullptr."
+  ],
+  "explanation": "A move transfers ownership of the existing resource instead of duplicating it."
+}

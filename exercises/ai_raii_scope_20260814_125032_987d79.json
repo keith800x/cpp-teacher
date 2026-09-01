@@ -1,0 +1,38 @@
+{
+  "exercise_schema_version": 1,
+  "id": "ai_raii_scope_20260814_125032_987d79",
+  "topic": "raii_scope",
+  "title": "Clear Parcel Supplies Before Courier Booking",
+  "difficulty": "medium",
+  "type": "fix_code",
+  "scenario": "A pharmacy distribution center prepares a temperature-sensitive parcel. The dispatch record is needed when the courier slot is booked, while a gel pack and a security seal are only needed during parcel preparation.",
+  "problem_statement": "completeShipment keeps gelPack and securitySeal alive while scheduleCourier(dispatchRecord) runs. Reorganize completeShipment so both preparation supplies are cleaned up before the courier is scheduled, while dispatchRecord remains available for scheduleCourier.",
+  "constraints": [
+    "Preserve the chillCargo, verifySeal, then scheduleCourier operation order.",
+    "Do not use new, delete, or explicit destructor calls.",
+    "Keep dispatchRecord available until scheduleCourier(dispatchRecord) has completed.",
+    "Change only declaration placement and block structure."
+  ],
+  "learning_objective": "Match automatic object lifetime to the smallest useful lexical scope so multiple RAII-managed resources are released deterministically, in reverse declaration order, before later work.",
+  "instructions": "The gel pack and security seal are both needed for preparation but not for courier scheduling. Adjust their lifetimes so preparation finishes and its supplies are cleaned up before the scheduling step begins.",
+  "starter_code": "void completeShipment()\n{\n    DispatchRecord dispatchRecord(\"dispatchRecord\");\n    ColdPack gelPack(\"gelPack\");\n    SecuritySeal securitySeal(\"securitySeal\");\n\n    {\n        chillCargo(gelPack);\n        verifySeal(securitySeal);\n    }\n\n    scheduleCourier(dispatchRecord);\n}",
+  "reference_solution": "void completeShipment()\n{\n    DispatchRecord dispatchRecord(\"dispatchRecord\");\n\n    {\n        ColdPack gelPack(\"gelPack\");\n        SecuritySeal securitySeal(\"securitySeal\");\n\n        chillCargo(gelPack);\n        verifySeal(securitySeal);\n    }\n\n    scheduleCourier(dispatchRecord);\n}",
+  "expected_concepts": [
+    "raii",
+    "automatic_storage_duration",
+    "lexical_scope",
+    "deterministic_cleanup",
+    "reverse_destruction_order"
+  ],
+  "concept_checks": [],
+  "hidden_test_file": "tests/ai_raii_scope_20260814_125032_987d79_tests.cpp",
+  "support_file": "support/ai_raii_scope_20260814_125032_987d79_support.hpp",
+  "trace_mode": "runtime_derived_raii",
+  "hints": [
+    "Consider which objects are still needed by scheduleCourier.",
+    "A local object is cleaned up when execution leaves the block where that object was created.",
+    "When several local objects leave a block together, the most recently created one is cleaned up first."
+  ],
+  "explanation": "dispatchRecord is created outside the preparation block because scheduleCourier needs it later. gelPack and securitySeal are created inside the preparation block, so they are cleaned up when that block ends. Since securitySeal was created after gelPack, it is cleaned up first. Both are gone before scheduleCourier begins.",
+  "learner_goal": "Finish parcel preparation and clear its gel pack and security seal before booking the courier, while retaining the dispatch record for the booking."
+}

@@ -1,0 +1,30 @@
+{
+  "id": "references_ast_001",
+  "topic": "references",
+  "title": "Pass by Reference",
+  "difficulty": 2,
+  "type": "implement_function",
+  "learning_objective": "Use a non-const lvalue reference parameter so a function modifies the caller's object.",
+  "instructions": "Fix setToTwenty so it modifies the original integer. Submit only the function; do not add main().",
+  "starter_code": "void setToTwenty(int value)\n{\n    value = 20;\n}",
+  "reference_solution": "void setToTwenty(int& value)\n{\n    value = 20;\n}",
+  "expected_concepts": [
+    "references",
+    "pass_by_reference",
+    "aliasing"
+  ],
+  "concept_checks": [
+    {
+      "type": "non_const_reference_parameter",
+      "function": "setToTwenty",
+      "parameter": "value"
+    }
+  ],
+  "hidden_test_file": "tests/references_ast_001_tests.cpp",
+  "hints": [
+    "Passing by value modifies only a copy.",
+    "The parameter must alias the caller's integer.",
+    "Use an lvalue reference parameter."
+  ],
+  "explanation": "A non-const lvalue reference parameter aliases the caller's object. Clang AST analysis verifies the parameter type."
+}

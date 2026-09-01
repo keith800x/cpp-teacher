@@ -1,0 +1,57 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Native/C++ build output
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Generated runtime/build artifacts
+output/
+*.o
+*.obj
+*.exe
+*.out
+
+# Patch installer backups
+.patch_backups/
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.log
+
+# Runtime/user data
+data/attempt_timelines/
+data/authoring_reference_timelines/
+data/solution_timelines/
+data/progress.json
+
+# Generated AI authoring artifacts
+candidates/generated/*.json
+candidates/generated/*.validation.json
+
+# Keep documentation in generated folder
+!candidates/generated/README.md
+
+# Internal development / patch notes
+STEP*_NOTES.txt
+STEP*_FIX*.txt
+STEP*_ENV_SETUP.txt
+PATCH_MANIFEST.txt
+MOVE_SEMANTICS_LEETCODE_PATCH.md

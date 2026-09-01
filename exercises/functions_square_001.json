@@ -1,0 +1,24 @@
+{
+  "id": "functions_square_001",
+  "topic": "functions",
+  "title": "Implement square()",
+  "difficulty": 1,
+  "type": "implement_function",
+  "learning_objective": "Implement a small function that behaves correctly for several inputs.",
+  "instructions": "Implement square(int value). Submit only the function shown below; do not add main(). Your solution will be checked against several hidden test cases.",
+  "starter_code": "int square(int value)\n{\n    // Your code here\n    return 0;\n}",
+  "reference_solution": "int square(int value)\n{\n    return value * value;\n}",
+  "expected_concepts": [
+    "functions",
+    "return_values",
+    "arithmetic"
+  ],
+  "required_code_fragments": [],
+  "hidden_test_file": "tests/functions_square_001_tests.cpp",
+  "hints": [
+    "The result should be value multiplied by itself.",
+    "Your function must work for positive, zero, and negative inputs.",
+    "Return value * value."
+  ],
+  "explanation": "A function should be correct for the full input contract, not just one example. Hidden tests check several inputs so a hard-coded answer cannot pass."
+}

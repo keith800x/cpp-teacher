@@ -1,0 +1,38 @@
+{
+  "exercise_schema_version": 1,
+  "id": "ai_raii_scope_20260825_080542_06bcf3",
+  "topic": "raii_scope",
+  "title": "Close the Tide Gauge Session Before Broadcast",
+  "difficulty": "easy",
+  "type": "fix_code",
+  "scenario": "The harbor control program collects morning water-level readings through a temporary tide gauge session, then sends a BulletinPacket to harbor operators. The radio broadcast must begin only after the gauge channel has been closed.",
+  "problem_statement": "In publishMorningBulletin, gaugeSession remains active while radioTransmit(bulletin) runs, even though captureTideReadings has already finished using it. Reorganize the lifetime of gaugeSession so it closes before the bulletin is transmitted, while bulletin remains available for the broadcast.",
+  "constraints": [
+    "Preserve the order of captureTideReadings followed by radioTransmit.",
+    "Do not use new, delete, or explicit destructor calls.",
+    "Keep bulletin alive until radioTransmit(bulletin) has completed.",
+    "Change only the placement of the temporary local object."
+  ],
+  "learning_objective": "Match an automatic object's lexical scope to its actual period of use so deterministic RAII cleanup occurs before the next operation.",
+  "instructions": "Keep the morning reading and broadcast behavior intact. Arrange the local objects so the tide gauge session is no longer active when the radio broadcast begins.",
+  "starter_code": "void publishMorningBulletin()\n{\n    BulletinPacket bulletin(\"morningBulletin\");\n    TideGaugeSession gaugeSession(\"gaugeSession\");\n\n    captureTideReadings(gaugeSession, bulletin);\n    radioTransmit(bulletin);\n}",
+  "reference_solution": "void publishMorningBulletin()\n{\n    BulletinPacket bulletin(\"morningBulletin\");\n\n    {\n        TideGaugeSession gaugeSession(\"gaugeSession\");\n        captureTideReadings(gaugeSession, bulletin);\n    }\n\n    radioTransmit(bulletin);\n}",
+  "expected_concepts": [
+    "raii",
+    "automatic_storage_duration",
+    "lexical_scope",
+    "deterministic_cleanup",
+    "reverse_destruction_order"
+  ],
+  "concept_checks": [],
+  "hidden_test_file": "tests/ai_raii_scope_20260825_080542_06bcf3_tests.cpp",
+  "support_file": "support/ai_raii_scope_20260825_080542_06bcf3_support.hpp",
+  "trace_mode": "runtime_derived_raii",
+  "hints": [
+    "The tide gauge is needed only while captureTideReadings is running.",
+    "A local object is cleaned up when execution leaves the block containing its declaration.",
+    "Give the reading operation its own smaller block, while leaving the bulletin available afterward."
+  ],
+  "explanation": "bulletin is created in the outer function body because both collecting readings and transmitting the result need it. gaugeSession is created in the smaller reading block, so its cleanup runs as soon as captureTideReadings returns. The radio broadcast therefore starts after the gauge channel has closed, while bulletin remains available until the function finishes.",
+  "learner_goal": "Close the temporary tide gauge session immediately after the morning readings are collected, before the harbor bulletin is broadcast."
+}

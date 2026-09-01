@@ -1,0 +1,46 @@
+{
+  "exercise_schema_version": 1,
+  "id": "references_alias_001",
+  "topic": "references",
+  "title": "Update Warehouse Stock Without Creating Stale Copies",
+  "difficulty": "easy",
+  "type": "fix_code",
+  "scenario": "A warehouse dashboard owns its live inventory count and display label. WarehouseDashboard::receive calls receiveShipment whenever a truck arrives, while WarehouseDashboard::labelLength calls warehouseLabelLength when the UI measures the current label.",
+  "problem_statement": "WarehouseDashboard::receive calls receiveShipment, but receiveShipment currently updates only its own stockCount object, so WarehouseDashboard::stockCount still reports the old inventory after a delivery. warehouseLabelLength also creates a separate std::string object even though WarehouseDashboard::labelLength only needs to inspect the existing label. Correct the two helper declarations without changing their bodies.",
+  "constraints": [
+    "Keep both function names and return types unchanged.",
+    "Do not change either function body.",
+    "Do not introduce global state."
+  ],
+  "learning_objective": "Choose reference parameter types when a function must modify caller-owned state or inspect an existing object without creating an unnecessary copy.",
+  "instructions": "Make WarehouseDashboard::receive persist each delivery in the dashboard's stored stock count, and make WarehouseDashboard::labelLength inspect the existing label without creating a redundant string object. Keep both helper function bodies unchanged.",
+  "starter_code": "#include <cstddef>\n#include <string>\n\nvoid receiveShipment(int stockCount, int delivered)\n{\n    stockCount += delivered;\n}\n\nstd::size_t warehouseLabelLength(const std::string label)\n{\n    return label.size();\n}\n\nclass WarehouseDashboard\n{\npublic:\n    WarehouseDashboard(int initialStock, std::string label)\n        : stockCount_(initialStock), label_(label)\n    {\n    }\n\n    void receive(int delivered)\n    {\n        receiveShipment(stockCount_, delivered);\n    }\n\n    std::size_t labelLength() const\n    {\n        return warehouseLabelLength(label_);\n    }\n\n    int stockCount() const\n    {\n        return stockCount_;\n    }\n\nprivate:\n    int stockCount_;\n    std::string label_;\n};\n",
+  "reference_solution": "#include <cstddef>\n#include <string>\n\nvoid receiveShipment(int& stockCount, int delivered)\n{\n    stockCount += delivered;\n}\n\nstd::size_t warehouseLabelLength(const std::string& label)\n{\n    return label.size();\n}\n\nclass WarehouseDashboard\n{\npublic:\n    WarehouseDashboard(int initialStock, std::string label)\n        : stockCount_(initialStock), label_(label)\n    {\n    }\n\n    void receive(int delivered)\n    {\n        receiveShipment(stockCount_, delivered);\n    }\n\n    std::size_t labelLength() const\n    {\n        return warehouseLabelLength(label_);\n    }\n\n    int stockCount() const\n    {\n        return stockCount_;\n    }\n\nprivate:\n    int stockCount_;\n    std::string label_;\n};\n",
+  "expected_concepts": [
+    "non_const_lvalue_reference",
+    "const_lvalue_reference",
+    "parameter_aliasing",
+    "avoid_unnecessary_copy"
+  ],
+  "concept_checks": [
+    {
+      "type": "non_const_reference_parameter",
+      "function": "receiveShipment",
+      "parameter": "stockCount"
+    },
+    {
+      "type": "const_reference_parameter",
+      "function": "warehouseLabelLength",
+      "parameter": "label"
+    }
+  ],
+  "hidden_test_file": "tests/references_alias_001_tests.cpp",
+  "trace_mode": "runtime",
+  "hints": [
+    "Ask whether receiveShipment should work with its own integer or with the caller's integer.",
+    "warehouseLabelLength never modifies label, but it also does not need an independent std::string object.",
+    "C++ has reference parameter forms for writable aliases and read-only aliases."
+  ],
+  "explanation": "receiveShipment needs a writable lvalue reference so changes affect the caller's stock variable. warehouseLabelLength needs a const lvalue reference so it observes the existing string without copying it and cannot modify it through that parameter.",
+  "learner_goal": "Make shipment updates affect the warehouse dashboard's live stock count while keeping label inspection lightweight and read-only."
+}

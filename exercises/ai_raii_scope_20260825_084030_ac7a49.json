@@ -1,0 +1,41 @@
+{
+  "exercise_schema_version": 1,
+  "id": "ai_raii_scope_20260825_084030_ac7a49",
+  "topic": "raii_scope",
+  "title": "Stage Exhibit Systems in Cleanup Order",
+  "difficulty": "hard",
+  "type": "fix_code",
+  "scenario": "The City Museum's evening exhibit controller prepares an interactive gallery before visitors arrive. A security override is needed while evacuation lights are reviewed, a calibration console is needed only for display calibration, and a projection rig is needed only while rendering a preview. Each temporary system must be shut down before the next gallery phase begins.",
+  "problem_statement": "In MuseumClimateController::prepareEveningExhibit, securityOverride, calibrationConsole, and projectionRig all remain active until the method ends. This leaves temporary exhibit systems running during later phases that no longer need them. Reorganize the local lifetimes so calibrateDisplay finishes and its console closes before reviewEvacuationLights, the security override closes before renderProjectionPreview, and the projection rig closes before announceExhibitReady.",
+  "constraints": [
+    "Preserve the operation order: calibrateDisplay, reviewEvacuationLights, renderProjectionPreview, then announceExhibitReady.",
+    "Do not use new, delete, or explicit destructor calls.",
+    "Keep eveningBrief available for every operation, including announceExhibitReady.",
+    "Keep the same local object names and the same helper calls.",
+    "Change only the placement of the temporary local object declarations and the blocks that contain them."
+  ],
+  "learning_objective": "Use nested lexical scopes to control automatic object lifetime, deterministic cleanup, and reverse destruction order for several dependent RAII-managed resources.",
+  "instructions": "Arrange the exhibit systems into cleanup boundaries that match the phases in which each system is actually needed. The final readiness announcement must occur only after all three temporary systems have closed.",
+  "starter_code": "class MuseumClimateController\n{\npublic:\n    void prepareEveningExhibit()\n    {\n        ExhibitBrief eveningBrief(\"eveningBrief\");\n        SecurityOverride securityOverride(\"securityOverride\");\n        CalibrationConsole calibrationConsole(\"calibrationConsole\");\n        ProjectionRig projectionRig(\"projectionRig\");\n\n        calibrateDisplay(calibrationConsole, eveningBrief);\n        reviewEvacuationLights(securityOverride, eveningBrief);\n        renderProjectionPreview(projectionRig, eveningBrief);\n        announceExhibitReady(eveningBrief);\n    }\n};",
+  "reference_solution": "class MuseumClimateController\n{\npublic:\n    void prepareEveningExhibit()\n    {\n        ExhibitBrief eveningBrief(\"eveningBrief\");\n\n        {\n            SecurityOverride securityOverride(\"securityOverride\");\n\n            {\n                CalibrationConsole calibrationConsole(\"calibrationConsole\");\n                calibrateDisplay(calibrationConsole, eveningBrief);\n            }\n\n            reviewEvacuationLights(securityOverride, eveningBrief);\n        }\n\n        {\n            ProjectionRig projectionRig(\"projectionRig\");\n            renderProjectionPreview(projectionRig, eveningBrief);\n        }\n\n        announceExhibitReady(eveningBrief);\n    }\n};",
+  "expected_concepts": [
+    "raii",
+    "automatic_storage_duration",
+    "lexical_scope",
+    "nested_scopes",
+    "deterministic_cleanup",
+    "reverse_destruction_order",
+    "resource_lifetime"
+  ],
+  "concept_checks": [],
+  "hidden_test_file": "tests/ai_raii_scope_20260825_084030_ac7a49_tests.cpp",
+  "support_file": "support/ai_raii_scope_20260825_084030_ac7a49_support.hpp",
+  "trace_mode": "runtime_derived_raii",
+  "hints": [
+    "Identify the final operation that needs each temporary exhibit system.",
+    "The calibration console should no longer be active once reviewEvacuationLights begins, while the security override is still needed for that review.",
+    "Create smaller blocks around each phase so leaving a phase also shuts down the systems used only by that phase."
+  ],
+  "explanation": "eveningBrief stays in the outer method body because every phase, including the final announcement, uses it. calibrationConsole is placed in the innermost calibration block, so it closes before the evacuation-light review. securityOverride surrounds both calibration and the review, so it closes immediately after that review and before projection rendering. projectionRig has its own later block and closes before the announcement. These nested boundaries cause cleanup at each phase transition rather than delaying all cleanup until the method returns.",
+  "learner_goal": "Shut down each temporary gallery system as soon as its exhibit phase finishes, so the final readiness announcement runs after all temporary systems are closed."
+}

@@ -1,0 +1,39 @@
+{
+  "exercise_schema_version": 1,
+  "id": "ai_references_20260814_081026_dbb79a",
+  "topic": "references",
+  "title": "Apply a Greenhouse Cooling Adjustment to the Live Target",
+  "difficulty": "easy",
+  "type": "fix_code",
+  "scenario": "A greenhouse climate controller keeps the desired temperature in a variable owned by its control loop. When a cooling cycle begins, the controller applies an adjustment to that live target.",
+  "problem_statement": "applyCoolingAdjustment currently changes only a local function parameter, so the greenhouse control loop keeps its old temperature target. Correct the function declaration so the caller-owned target is updated. Do not change the function body.",
+  "constraints": [
+    "Keep the function name and return type unchanged.",
+    "Do not change the function body.",
+    "Do not introduce global state."
+  ],
+  "learning_objective": "Use a writable reference parameter when a function must modify caller-owned state instead of modifying a copy.",
+  "instructions": "The cooling controller should lower the target temperature held by the caller. After applyCoolingAdjustment runs, the caller must observe the adjusted target. Update the function declaration while preserving its existing body.",
+  "starter_code": "void applyCoolingAdjustment(int targetTemperature, int coolingDegrees)\n{\n    targetTemperature -= coolingDegrees;\n}",
+  "reference_solution": "void applyCoolingAdjustment(int& targetTemperature, int coolingDegrees)\n{\n    targetTemperature -= coolingDegrees;\n}",
+  "expected_concepts": [
+    "non_const_lvalue_reference",
+    "parameter_aliasing",
+    "caller_owned_state"
+  ],
+  "concept_checks": [
+    {
+      "type": "non_const_reference_parameter",
+      "function": "applyCoolingAdjustment",
+      "parameter": "targetTemperature"
+    }
+  ],
+  "hidden_test_file": "tests/ai_references_20260814_081026_dbb79a_tests.cpp",
+  "trace_mode": "runtime",
+  "hints": [
+    "Consider whether targetTemperature should be an independent local value or another name for the caller's value.",
+    "The function body already performs the required arithmetic.",
+    "The caller needs to observe the change after the function returns."
+  ],
+  "explanation": "The temperature target belongs to the control loop, so applyCoolingAdjustment must work with that same integer rather than a copied parameter. A writable reference parameter aliases the caller's target, allowing the existing subtraction to persist after the call."
+}

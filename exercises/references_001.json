@@ -1,0 +1,26 @@
+{
+  "id": "references_001",
+  "topic": "references",
+  "title": "Modify Through a Reference",
+  "difficulty": 1,
+  "type": "predict_and_fix",
+  "learning_objective": "Understand that a non-const reference aliases an existing object instead of copying it.",
+  "instructions": "Complete the program so modify changes value to 20 through a reference. The program must print 20.",
+  "starter_code": "#include <iostream>\n\nvoid modify(int value)\n{\n    value = 20;\n}\n\nint main()\n{\n    int value = 10;\n    modify(value);\n    std::cout << value << '\\n';\n\n    return 0;\n}",
+  "reference_solution": "#include <iostream>\n\nvoid modify(int& value)\n{\n    value = 20;\n}\n\nint main()\n{\n    int value = 10;\n    modify(value);\n    std::cout << value << '\\n';\n\n    return 0;\n}",
+  "expected_concepts": [
+    "references",
+    "aliasing",
+    "pass_by_reference"
+  ],
+  "required_code_fragments": [
+    "int&"
+  ],
+  "expected_output": "20\n",
+  "hints": [
+    "Passing an int by value creates a copy.",
+    "The function parameter needs to refer to the original int.",
+    "Use an int& parameter."
+  ],
+  "explanation": "An int& parameter is a reference to the original object. Assigning 20 through the reference modifies value in main, so the program prints 20."
+}

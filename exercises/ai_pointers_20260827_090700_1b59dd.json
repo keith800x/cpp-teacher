@@ -1,0 +1,36 @@
+{
+  "exercise_schema_version": 1,
+  "id": "ai_pointers_20260827_090700_1b59dd",
+  "topic": "pointers",
+  "title": "Keep the Arrival Board Updated",
+  "difficulty": "easy",
+  "type": "fix_code",
+  "scenario": "At a city transit hub, an ArrivalBoard follows one live Shuttle selected by the dispatcher. The dispatcher still owns the Shuttle record and may update its destination while the board is displaying it.",
+  "problem_statement": "`ArrivalBoard::watch` is called when the dispatcher selects a `Shuttle`, but the board still behaves as though it is not watching anything. Correct `ArrivalBoard::watch` so that `currentDestination()` reports the selected shuttle's destination and continues to report its later destination changes.",
+  "constraints": [
+    "Do not change the public methods of `Shuttle` or `ArrivalBoard`.",
+    "The selected `Shuttle` remains alive while the `ArrivalBoard` watches it.",
+    "The board watches at most one shuttle at a time."
+  ],
+  "learning_objective": "Use a raw non-owning pointer member to retain the identity of an existing live object, preserve a null state, and read the pointee through a null-aware query.",
+  "instructions": "Update the implementation of `ArrivalBoard::watch`. Keep the existing behavior of `isWatching()` and `currentDestination()` intact.",
+  "starter_code": "#include <string>\n\nclass Shuttle {\npublic:\n    explicit Shuttle(std::string destination) : destination_(destination) {}\n\n    void setDestination(const std::string& destination) {\n        destination_ = destination;\n    }\n\n    const std::string& destination() const {\n        return destination_;\n    }\n\nprivate:\n    std::string destination_;\n};\n\nclass ArrivalBoard {\npublic:\n    ArrivalBoard() : watched_(nullptr) {}\n\n    void watch(Shuttle& shuttle) {\n        watched_ = nullptr;\n    }\n\n    bool isWatching() const {\n        return watched_ != nullptr;\n    }\n\n    std::string currentDestination() const {\n        return watched_ == nullptr ? \"No shuttle selected\" : watched_->destination();\n    }\n\nprivate:\n    Shuttle* watched_;\n};\n",
+  "reference_solution": "#include <string>\n\nclass Shuttle {\npublic:\n    explicit Shuttle(std::string destination) : destination_(destination) {}\n\n    void setDestination(const std::string& destination) {\n        destination_ = destination;\n    }\n\n    const std::string& destination() const {\n        return destination_;\n    }\n\nprivate:\n    std::string destination_;\n};\n\nclass ArrivalBoard {\npublic:\n    ArrivalBoard() : watched_(nullptr) {}\n\n    void watch(Shuttle& shuttle) {\n        watched_ = &shuttle;\n    }\n\n    bool isWatching() const {\n        return watched_ != nullptr;\n    }\n\n    std::string currentDestination() const {\n        return watched_ == nullptr ? \"No shuttle selected\" : watched_->destination();\n    }\n\nprivate:\n    Shuttle* watched_;\n};\n",
+  "expected_concepts": [
+    "raw non-owning pointer member",
+    "null pointer state",
+    "binding a pointer to an existing object",
+    "dereference-based read access",
+    "pointee identity"
+  ],
+  "concept_checks": [],
+  "hidden_test_file": "tests/ai_pointers_20260827_090700_1b59dd_tests.cpp",
+  "trace_mode": "runtime",
+  "hints": [
+    "The board needs to remember the shuttle chosen by the dispatcher.",
+    "Look at the type of `watched_` and at the object received by `watch`.",
+    "After the dispatcher changes the selected shuttle's destination, the board should obtain the new destination from that same shuttle."
+  ],
+  "explanation": "`ArrivalBoard` must retain the identity of the existing `Shuttle` supplied to `watch`. Once `watched_` is connected to that live shuttle, `currentDestination()` reads the shuttle's current destination. Its existing null check still handles a board that has not selected a shuttle.",
+  "learner_goal": "Make the arrival board show a selected shuttle's current destination after the dispatcher changes that shuttle's destination elsewhere."
+}

@@ -1,0 +1,45 @@
+{
+  "topics_version": 1,
+  "topics": [
+    {
+      "id": "references",
+      "display_name": "References",
+      "description": "Reference parameters, const references, aliasing, and choosing between copying and observing caller-owned objects.",
+      "generation_guidance": {
+        "easy": "One clear pass-by-value or unnecessary-copy bug in a short function. The required behavior should reveal why an alias is needed.",
+        "medium": "A realistic API with multiple parameters or interacting read/write views where the learner must choose const versus non-const references.",
+        "hard": "Reference lifetime, overload/API design, or aliasing interactions that require reasoning across multiple functions without undefined behavior."
+      }
+    },
+    {
+      "id": "raii_scope",
+      "display_name": "RAII and Scope",
+      "description": "Automatic object lifetime, lexical scope, deterministic cleanup, and reverse destruction order.",
+      "generation_guidance": {
+        "easy": "A single temporary resource lives too long and should be placed in a narrower block.",
+        "medium": "Several resources have different useful lifetimes and cleanup must occur before later work.",
+        "hard": "Nested scopes or multiple dependent resources require careful lifetime ordering while preserving program behavior."
+      }
+    },
+    {
+      "id": "move_semantics",
+      "display_name": "Move Semantics",
+      "description": "Move construction, ownership transfer, moved-from state, resource identity, and noexcept behavior.",
+      "generation_guidance": {
+        "easy": "A small movable type has an obvious ownership transfer bug with one resource-owning member.",
+        "medium": "A domain object owns multiple pieces of state and the learner must preserve invariants while transferring ownership.",
+        "hard": "A resource-owning class must avoid duplicate allocation, preserve resource identity, leave a valid moved-from object, and satisfy noexcept."
+      }
+    },
+    {
+      "id": "pointers",
+      "display_name": "Pointers",
+      "description": "Raw pointer syntax, pointee identity, null state, dereference-based access, aliasing, reseating, and lifetime-aware non-owning observation.",
+      "generation_guidance": {
+        "easy": "One raw pointer observes or updates one existing object. Use one clear pointer/pointee relationship, no dangling-lifetime scenario, and at most one write-through path.",
+        "medium": "Several pointer-state decisions interact: null handling, reseating between existing objects, aliasing, or mutation through a pointer. Keep the pointees alive for the entire operation so lifetime/dangling reasoning is not yet the main challenge.",
+        "hard": "Multiple raw pointers may alias the same pointee, mutation through one view must be visible through another, and at least one pointer crosses a pointee lifetime boundary. The exercise must handle the stale/dangling risk safely without dereferencing a dead object."
+      }
+    }
+  ]
+}

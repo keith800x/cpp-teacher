@@ -1,0 +1,14 @@
+Step 9 WSL / older Clang compatibility patch
+
+Changes:
+1. Passes -ast-dump-filter and its value as separate -Xclang arguments:
+   -Xclang -ast-dump-filter -Xclang cpp_teacher_student_main
+
+2. Tolerates older Clang filtered JSON output that begins with:
+   Dumping cpp_teacher_student_main:
+
+Rebuild:
+  rm -rf build
+  cmake -S . -B build
+  cmake --build build
+  ./build/cpp_teacher

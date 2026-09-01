@@ -1,0 +1,39 @@
+{
+  "exercise_schema_version": 1,
+  "id": "ai_pointers_20260827_101013_80fcb9",
+  "topic": "pointers",
+  "title": "Retire a Cargo Tag Without Leaving a Stale View",
+  "difficulty": "hard",
+  "type": "fix_code",
+  "scenario": "At a harbor inspection station, a dock supervisor uses a DockConsole to adjust the priority on the active CargoTag, while an AuditDisplay shows the same tag to an inspector. Cargo tags are created for a shift and later retired, so both station devices must stop using an old tag before or when they switch to a live replacement.",
+  "problem_statement": "`DockConsole::assign`, `AuditDisplay::watch`, and the two `clear` operations currently lose or retain the wrong CargoTag state. Make the console and display follow the selected live tag, ensure `DockConsole::boostPriority` changes the tag seen by `AuditDisplay`, and ensure the display can switch away from a retired tag before it is queried again.",
+  "constraints": [
+    "Do not change the public methods or data members of `CargoTag`, `DockConsole`, or `AuditDisplay`.",
+    "`DockConsole` may change the priority of its active tag, while `AuditDisplay` only reports information.",
+    "A console and display may be assigned to the same live CargoTag.",
+    "A tag can be retired after the display has switched to another live tag.",
+    "The public query methods must remain safe when no tag is assigned."
+  ],
+  "learning_objective": "Use raw non-owning pointer members to preserve pointee identity, represent null state, support aliasing between holders, mutate a shared heap pointee through a writable pointer, reseat a pointer before a former pointee is retired, and avoid dereferencing stale pointers.",
+  "instructions": "Correct the assignment, clearing, and viewing behavior in the existing classes. Keep the null-aware query behavior intact, and do not add ownership to either station device.",
+  "starter_code": "#include <string>\n\nclass CargoTag {\npublic:\n    CargoTag(std::string code, int priority)\n        : code_(code), priority_(priority) {}\n\n    void rename(const std::string& newCode) {\n        code_ = newCode;\n    }\n\n    void addPriority(int amount) {\n        priority_ += amount;\n    }\n\n    const std::string& code() const {\n        return code_;\n    }\n\n    int priority() const {\n        return priority_;\n    }\n\nprivate:\n    std::string code_;\n    int priority_;\n};\n\nclass DockConsole {\npublic:\n    DockConsole() : active_(nullptr) {}\n\n    void assign(CargoTag* tag) {\n        active_ = nullptr;\n    }\n\n    void clear() {\n    }\n\n    bool hasActive() const {\n        return active_ != nullptr;\n    }\n\n    std::string activeCode() const {\n        return active_ == nullptr ? \"No active cargo\" : active_->code();\n    }\n\n    int activePriority() const {\n        return active_ == nullptr ? -1 : active_->priority();\n    }\n\n    void boostPriority(int amount) {\n        if (active_ != nullptr) {\n            active_->addPriority(amount);\n        }\n    }\n\nprivate:\n    CargoTag* active_;\n};\n\nclass AuditDisplay {\npublic:\n    AuditDisplay() : watched_(nullptr) {}\n\n    void watch(const CargoTag* tag) {\n        watched_ = nullptr;\n    }\n\n    void clear() {\n    }\n\n    bool hasWatched() const {\n        return watched_ != nullptr;\n    }\n\n    std::string watchedCode() const {\n        return watched_ == nullptr ? \"No cargo under review\" : watched_->code();\n    }\n\n    int watchedPriority() const {\n        return watched_ == nullptr ? -1 : watched_->priority();\n    }\n\nprivate:\n    const CargoTag* watched_;\n};\n",
+  "reference_solution": "#include <string>\n\nclass CargoTag {\npublic:\n    CargoTag(std::string code, int priority)\n        : code_(code), priority_(priority) {}\n\n    void rename(const std::string& newCode) {\n        code_ = newCode;\n    }\n\n    void addPriority(int amount) {\n        priority_ += amount;\n    }\n\n    const std::string& code() const {\n        return code_;\n    }\n\n    int priority() const {\n        return priority_;\n    }\n\nprivate:\n    std::string code_;\n    int priority_;\n};\n\nclass DockConsole {\npublic:\n    DockConsole() : active_(nullptr) {}\n\n    void assign(CargoTag* tag) {\n        active_ = tag;\n    }\n\n    void clear() {\n        active_ = nullptr;\n    }\n\n    bool hasActive() const {\n        return active_ != nullptr;\n    }\n\n    std::string activeCode() const {\n        return active_ == nullptr ? \"No active cargo\" : active_->code();\n    }\n\n    int activePriority() const {\n        return active_ == nullptr ? -1 : active_->priority();\n    }\n\n    void boostPriority(int amount) {\n        if (active_ != nullptr) {\n            active_->addPriority(amount);\n        }\n    }\n\nprivate:\n    CargoTag* active_;\n};\n\nclass AuditDisplay {\npublic:\n    AuditDisplay() : watched_(nullptr) {}\n\n    void watch(const CargoTag* tag) {\n        watched_ = tag;\n    }\n\n    void clear() {\n        watched_ = nullptr;\n    }\n\n    bool hasWatched() const {\n        return watched_ != nullptr;\n    }\n\n    std::string watchedCode() const {\n        return watched_ == nullptr ? \"No cargo under review\" : watched_->code();\n    }\n\n    int watchedPriority() const {\n        return watched_ == nullptr ? -1 : watched_->priority();\n    }\n\nprivate:\n    const CargoTag* watched_;\n};\n",
+  "expected_concepts": [
+    "raw non-owning pointer members",
+    "null pointer state",
+    "pointer binding and reseating",
+    "multiple pointer holders aliasing one pointee",
+    "dereference-based mutation through a raw pointer",
+    "lifetime-aware clearing of non-owning views"
+  ],
+  "concept_checks": [],
+  "hidden_test_file": "tests/ai_pointers_20260827_101013_80fcb9_tests.cpp",
+  "trace_mode": "runtime",
+  "hints": [
+    "The console and the display should be able to refer to the same tag rather than each maintaining a separate tag state.",
+    "After the console changes a tag's priority, the display should report that changed priority without being assigned again.",
+    "When a station is cleared or switched to a replacement tag, later queries must use the new state rather than an earlier retired tag."
+  ],
+  "explanation": "The station devices do not own CargoTag objects; they only remember which currently live tag they are using. Assigning the incoming tag lets the console and display refer to the same object, so a priority change made through the console is visible on the display. Clearing removes a station's current association, and switching the display to a replacement removes its association with the old tag before that old tag is retired.",
+  "learner_goal": "Make the dock console and audit display stay synchronized on the same live cargo tag, support switching to a replacement tag, and avoid reporting a retired tag."
+}

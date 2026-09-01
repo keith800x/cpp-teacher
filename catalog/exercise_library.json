@@ -1,0 +1,60 @@
+{
+  "library_version": 1,
+  "exercises": [
+    {
+      "exercise_id": "ai_move_semantics_20260828_101133_286f4d",
+      "exercise_file": "exercises/ai_move_semantics_20260828_101133_286f4d.json",
+      "published": true
+    },
+    {
+      "exercise_id": "ai_pointers_20260826_091606_849f67",
+      "exercise_file": "exercises/ai_pointers_20260826_091606_849f67.json",
+      "published": true
+    },
+    {
+      "exercise_id": "ai_pointers_20260827_090700_1b59dd",
+      "exercise_file": "exercises/ai_pointers_20260827_090700_1b59dd.json",
+      "published": true
+    },
+    {
+      "exercise_id": "ai_pointers_20260827_093510_fac868",
+      "exercise_file": "exercises/ai_pointers_20260827_093510_fac868.json",
+      "published": true
+    },
+    {
+      "exercise_id": "ai_pointers_20260827_101013_80fcb9",
+      "exercise_file": "exercises/ai_pointers_20260827_101013_80fcb9.json",
+      "published": true
+    },
+    {
+      "exercise_id": "ai_raii_scope_20260814_125032_987d79",
+      "exercise_file": "exercises/ai_raii_scope_20260814_125032_987d79.json",
+      "published": true
+    },
+    {
+      "exercise_id": "ai_raii_scope_20260825_080542_06bcf3",
+      "exercise_file": "exercises/ai_raii_scope_20260825_080542_06bcf3.json",
+      "published": true
+    },
+    {
+      "exercise_id": "ai_raii_scope_20260825_084030_ac7a49",
+      "exercise_file": "exercises/ai_raii_scope_20260825_084030_ac7a49.json",
+      "published": true
+    },
+    {
+      "exercise_id": "move_runtime_trace_001",
+      "exercise_file": "exercises/move_runtime_trace_001.json",
+      "published": true
+    },
+    {
+      "exercise_id": "raii_scope_001",
+      "exercise_file": "exercises/raii_scope_001.json",
+      "published": true
+    },
+    {
+      "exercise_id": "references_alias_001",
+      "exercise_file": "exercises/references_alias_001.json",
+      "published": true
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "unique_ptr_ast_001",
+  "topic": "unique_ptr",
+  "title": "Transfer Ownership with std::move",
+  "difficulty": 2,
+  "type": "fix_code",
+  "learning_objective": "Transfer unique ownership by using an actual std::move call in the initialization of the new owner.",
+  "instructions": "Fix the program so second takes ownership from player using std::move(player). Submit the complete program.",
+  "starter_code": "#include <memory>\n\nstruct Player\n{\n};\n\nint main()\n{\n    auto player = std::make_unique<Player>();\n    auto second = player;\n\n    return 0;\n}",
+  "reference_solution": "#include <memory>\n#include <utility>\n\nstruct Player\n{\n};\n\nint main()\n{\n    auto player = std::make_unique<Player>();\n    auto second = std::move(player);\n\n    return 0;\n}",
+  "expected_concepts": [
+    "unique_ptr",
+    "std::move",
+    "ownership_transfer"
+  ],
+  "concept_checks": [
+    {
+      "type": "std_move_initializer",
+      "variable": "second",
+      "argument": "player"
+    }
+  ],
+  "hints": [
+    "std::unique_ptr cannot be copied.",
+    "The new owner should be initialized from an xvalue produced from player.",
+    "Initialize second with std::move(player)."
+  ],
+  "explanation": "std::move does not move an object by itself; it produces an xvalue expression that allows the move constructor of std::unique_ptr to transfer ownership. The AST check verifies that second is actually initialized from std::move(player)."
+}

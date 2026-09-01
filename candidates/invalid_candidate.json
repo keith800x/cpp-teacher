@@ -1,0 +1,55 @@
+{
+  "candidate_schema_version": 1,
+  "generation_metadata": {
+    "generator": "manual_step27_example",
+    "requested_topic": "references",
+    "requested_difficulty": "easy"
+  },
+  "exercise": {
+    "exercise_schema_version": 1,
+    "id": "references_inventory_candidate_001",
+    "topic": "references",
+    "title": "Keep a Store Reorder Count Connected to the Caller",
+    "difficulty": "easy",
+    "type": "fix_code",
+    "scenario": "You are maintaining a retail replenishment service. A helper function receives the store's reorder count and the number of newly approved units, while another function reads a product description supplied by the caller.",
+    "problem_statement": "The reorder helper currently updates only a local integer copy, so the caller's count never changes. The description helper also creates an unnecessary string copy even though it only reads the text. Correct both API behaviors without rewriting the function bodies.",
+    "constraints": [
+      "Keep the function bodies unchanged.",
+      "Do not introduce global variables.",
+      "Keep the existing function names and return types."
+    ],
+    "learning_objective": "Choose writable and read-only reference parameters when an API must work with caller-owned state without creating disconnected or unnecessary copies.",
+    "instructions": "The reorder helper currently updates only a local integer copy, so the caller's count never changes. The description helper also creates an unnecessary string copy even though it only reads the text. Correct both API behaviors without rewriting the function bodies.",
+    "starter_code": "#include <cstddef>\n#include <string>\n\n//TODO: use a reference here void approveReorder(int reorderCount, int approvedUnits)\n{\n    reorderCount += approvedUnits;\n}\n\nstd::size_t productDescriptionLength(const std::string description)\n{\n    return description.size();\n}",
+    "reference_solution": "#include <cstddef>\n#include <string>\n\nvoid approveReorder(int& reorderCount, int approvedUnits)\n{\n    reorderCount += approvedUnits;\n}\n\nstd::size_t productDescriptionLength(const std::string& description)\n{\n    return description.size();\n}",
+    "expected_concepts": [
+      "non_const_lvalue_reference",
+      "const_lvalue_reference",
+      "parameter_aliasing"
+    ],
+    "concept_checks": [
+      {
+        "type": "non_const_reference_parameter",
+        "function": "approveReorder",
+        "parameter": "reorderCount"
+      },
+      {
+        "type": "const_reference_parameter",
+        "function": "productDescriptionLength",
+        "parameter": "description"
+      }
+    ],
+    "hidden_test_file": "tests/references_inventory_candidate_001_tests.cpp",
+    "trace_mode": "runtime",
+    "hints": [
+      "Ask whether approveReorder should modify its own integer or the caller's integer.",
+      "The description function needs read access but does not need a separate std::string object.",
+      "Choose parameter types that express writable aliasing versus read-only aliasing."
+    ],
+    "explanation": "The reorder parameter must alias the caller's integer so the update is observable outside the function. The description parameter can be a const reference, which avoids copying while preventing writes through that parameter."
+  },
+  "files": {
+    "tests/references_inventory_candidate_001_tests.cpp": "#include <cstdio>\n#include <string>\n#include <type_traits>\n\nint main()\n{\n    constexpr bool reorderUsesReference =\n        std::is_same_v<\n            decltype(&approveReorder),\n            void (*)(int&, int)\n        >;\n\n    constexpr bool descriptionUsesConstReference =\n        std::is_same_v<\n            decltype(&productDescriptionLength),\n            std::size_t (*)(const std::string&)\n        >;\n\n    std::fprintf(\n        stderr,\n        \"TRACE|ENTER_SCOPE|caller|retail replenishment request\\n\"\n    );\n\n    int reorderCount = 12;\n\n    std::fprintf(\n        stderr,\n        \"TRACE|CREATE_VALUE|reorderCount|type=int|value=%d\\n\",\n        reorderCount\n    );\n\n    std::fprintf(\n        stderr,\n        \"TRACE|ENTER_SCOPE|approveReorder|function call\\n\"\n    );\n\n    if constexpr (reorderUsesReference)\n    {\n        std::fprintf(\n            stderr,\n            \"TRACE|BIND_ALIAS|parameterReorderCount|target=reorderCount|type=int&|const=false\\n\"\n        );\n    }\n    else\n    {\n        std::fprintf(\n            stderr,\n            \"TRACE|CREATE_VALUE|parameterReorderCount|type=int|value=%d\\n\",\n            reorderCount\n        );\n    }\n\n    approveReorder(\n        reorderCount,\n        8\n    );\n\n    std::fprintf(\n        stderr,\n        \"TRACE|WRITE_VALUE|reorderCount|via=approveReorder|value=%d\\n\",\n        reorderCount\n    );\n\n    std::fprintf(\n        stderr,\n        \"TRACE|EXIT_SCOPE|approveReorder|function returned\\n\"\n    );\n\n    const std::string description =\n        \"Rechargeable work light\";\n\n    std::fprintf(\n        stderr,\n        \"TRACE|CREATE_VALUE|description|type=std::string|value=Rechargeable work light\\n\"\n    );\n\n    std::fprintf(\n        stderr,\n        \"TRACE|ENTER_SCOPE|productDescriptionLength|function call\\n\"\n    );\n\n    if constexpr (descriptionUsesConstReference)\n    {\n        std::fprintf(\n            stderr,\n            \"TRACE|BIND_ALIAS|parameterDescription|target=description|type=const std::string&|const=true\\n\"\n        );\n    }\n    else\n    {\n        std::fprintf(\n            stderr,\n            \"TRACE|CREATE_VALUE|parameterDescription|type=std::string|value=Rechargeable work light\\n\"\n        );\n    }\n\n    const std::size_t length =\n        productDescriptionLength(\n            description\n        );\n\n    std::fprintf(\n        stderr,\n        \"TRACE|EXIT_SCOPE|productDescriptionLength|function returned\\n\"\n    );\n\n    std::fprintf(\n        stderr,\n        \"TRACE|EXIT_SCOPE|caller|retail replenishment request completed\\n\"\n    );\n\n    if (reorderCount != 20)\n    {\n        std::fprintf(\n            stderr,\n            \"Expected caller reorderCount to become 20, got %d.\\n\",\n            reorderCount\n        );\n\n        return 2;\n    }\n\n    if (length != description.size())\n    {\n        return 3;\n    }\n\n    if (!reorderUsesReference)\n    {\n        return 4;\n    }\n\n    if (!descriptionUsesConstReference)\n    {\n        return 5;\n    }\n\n    return 0;\n}\n"
+  }
+}

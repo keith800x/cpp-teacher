@@ -1,0 +1,29 @@
+{
+  "id": "copy_constructor_001",
+  "topic": "copy_move",
+  "title": "Implement a Deep Copy Constructor",
+  "difficulty": 3,
+  "type": "implement_class_member",
+  "learning_objective": "Implement a user-declared copy constructor that performs a deep copy of owned heap data.",
+  "instructions": "Add a copy constructor to Buffer. A copied Buffer must own a separate int with the same value. Submit the complete Buffer class only; do not add main().",
+  "starter_code": "class Buffer\n{\npublic:\n    explicit Buffer(int value)\n        : data_(new int(value))\n    {\n    }\n\n    ~Buffer()\n    {\n        delete data_;\n    }\n\n    int value() const\n    {\n        return *data_;\n    }\n\n    void setValue(int value)\n    {\n        *data_ = value;\n    }\n\nprivate:\n    int* data_;\n};",
+  "reference_solution": "class Buffer\n{\npublic:\n    explicit Buffer(int value)\n        : data_(new int(value))\n    {\n    }\n\n    Buffer(const Buffer& other)\n        : data_(new int(*other.data_))\n    {\n    }\n\n    ~Buffer()\n    {\n        delete data_;\n    }\n\n    int value() const\n    {\n        return *data_;\n    }\n\n    void setValue(int value)\n    {\n        *data_ = value;\n    }\n\nprivate:\n    int* data_;\n};",
+  "expected_concepts": [
+    "copy_constructor",
+    "deep_copy",
+    "resource_ownership"
+  ],
+  "concept_checks": [
+    {
+      "type": "copy_constructor",
+      "class": "Buffer"
+    }
+  ],
+  "hidden_test_file": "tests/copy_constructor_001_tests.cpp",
+  "hints": [
+    "The constructor should take const Buffer&.",
+    "Allocate a separate int instead of copying the pointer.",
+    "Initialize data_ with new int(*other.data_)."
+  ],
+  "explanation": "A deep copy duplicates the owned value into independent storage so each Buffer owns exactly one allocation."
+}

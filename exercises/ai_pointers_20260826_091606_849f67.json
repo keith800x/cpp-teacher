@@ -1,0 +1,36 @@
+{
+  "exercise_schema_version": 1,
+  "id": "ai_pointers_20260826_091606_849f67",
+  "topic": "pointers",
+  "title": "Keep the Garden Display Focused",
+  "difficulty": "easy",
+  "type": "fix_code",
+  "scenario": "A community garden kiosk displays details for one plant selected by a volunteer. The selected plant remains owned by the volunteer's garden record, while GardenDisplay only observes it for as long as the kiosk screen is open.",
+  "problem_statement": "`GardenDisplay::highlight` is called when a volunteer selects a `Plant`, but the display currently reports that no plant is focused. Correct `GardenDisplay::highlight` so that `GardenDisplay` observes the selected live plant. If the volunteer later renames that same plant, `focusedLabel()` must show the new label without selecting it again.",
+  "constraints": [
+    "Do not change the public methods of `Plant` or `GardenDisplay`.",
+    "The selected `Plant` remains alive while the display uses it.",
+    "`GardenDisplay` observes only one selected plant at a time."
+  ],
+  "learning_objective": "Use a raw non-owning pointer to store the identity of an existing live object and access that pointee safely through a null-aware public query.",
+  "instructions": "Update the implementation of `GardenDisplay::highlight`. Keep the existing behavior of `hasFocus()` and `focusedLabel()` intact.",
+  "starter_code": "#include <string>\n\nclass Plant {\npublic:\n    explicit Plant(std::string label) : label_(label) {}\n\n    void rename(const std::string& newLabel) {\n        label_ = newLabel;\n    }\n\n    const std::string& label() const {\n        return label_;\n    }\n\nprivate:\n    std::string label_;\n};\n\nclass GardenDisplay {\npublic:\n    GardenDisplay() : focused_(nullptr) {}\n\n    void highlight(Plant& plant) {\n        focused_ = nullptr;\n    }\n\n    bool hasFocus() const {\n        return focused_ != nullptr;\n    }\n\n    std::string focusedLabel() const {\n        return focused_ == nullptr ? \"No plant selected\" : focused_->label();\n    }\n\nprivate:\n    Plant* focused_;\n};\n",
+  "reference_solution": "#include <string>\n\nclass Plant {\npublic:\n    explicit Plant(std::string label) : label_(label) {}\n\n    void rename(const std::string& newLabel) {\n        label_ = newLabel;\n    }\n\n    const std::string& label() const {\n        return label_;\n    }\n\nprivate:\n    std::string label_;\n};\n\nclass GardenDisplay {\npublic:\n    GardenDisplay() : focused_(nullptr) {}\n\n    void highlight(Plant& plant) {\n        focused_ = &plant;\n    }\n\n    bool hasFocus() const {\n        return focused_ != nullptr;\n    }\n\n    std::string focusedLabel() const {\n        return focused_ == nullptr ? \"No plant selected\" : focused_->label();\n    }\n\nprivate:\n    Plant* focused_;\n};\n",
+  "expected_concepts": [
+    "raw non-owning pointer member",
+    "null pointer state",
+    "binding a pointer to an existing object",
+    "dereference-based read access",
+    "pointee identity"
+  ],
+  "concept_checks": [],
+  "hidden_test_file": "tests/ai_pointers_20260826_091606_849f67_tests.cpp",
+  "trace_mode": "runtime",
+  "hints": [
+    "The display should retain the selected plant itself, not just decide whether a focus exists.",
+    "Look at the type of `focused_` and the object received by `highlight`.",
+    "The label returned after a later rename should come from the originally selected `Plant`."
+  ],
+  "explanation": "`GardenDisplay` needs to retain the identity of the existing `Plant` passed to `highlight`. Storing that plant's address in `focused_` makes `focusedLabel()` read the current label from the same live object. The existing null check continues to handle a display that has not selected anything yet.",
+  "learner_goal": "Make the garden display continue showing the selected plant's current label after that plant is renamed elsewhere."
+}

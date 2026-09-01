@@ -1,0 +1,44 @@
+{
+  "exercise_schema_version": 1,
+  "id": "move_runtime_trace_001",
+  "topic": "move_semantics",
+  "title": "Transfer Upload Payload Ownership Without Duplicating Memory",
+  "difficulty": "hard",
+  "type": "fix_code",
+  "scenario": "An upload service stores failed UploadPacket objects in a retry queue. Each UploadPacket exclusively owns one PacketStorage payload containing the bytes that must be retried.",
+  "problem_statement": "UploadPacket's current move constructor allocates a new PacketStorage and copies the byte count instead of transferring the existing payload. The destination therefore gets a second allocation while the source still owns the original payload. Correct the UploadPacket move behavior so retry handling takes over the same allocation and the source becomes empty.",
+  "constraints": [
+    "Do not enable copying.",
+    "Keep the existing public API unchanged.",
+    "The move constructor must remain noexcept.",
+    "A successful move must not allocate a replacement PacketStorage."
+  ],
+  "learning_objective": "Implement move construction so an exclusively owned heap resource is transferred to a new object without allocating a duplicate, while leaving the moved-from object valid and empty.",
+  "instructions": "Keep UploadPacket non-copyable and preserve its public API. Fix the transfer so no replacement PacketStorage allocation is created, the destination owns the original payload, and the moved-from packet is empty.",
+  "starter_code": "#include <cstddef>\n#include <memory>\n#include <utility>\n\nclass UploadPacket\n{\npublic:\n    explicit UploadPacket(std::size_t bytes)\n        : payload_(\n            std::make_unique<PacketStorage>(bytes)\n        )\n    {\n    }\n\n    UploadPacket(const UploadPacket&) = delete;\n    UploadPacket& operator=(const UploadPacket&) = delete;\n\n    UploadPacket(UploadPacket&& other) noexcept\n        : payload_(\n            other.payload_\n                ? std::make_unique<PacketStorage>(\n                    other.payload_->bytes()\n                  )\n                : nullptr\n        )\n    {\n    }\n\n    ~UploadPacket() = default;\n\n    bool empty() const noexcept\n    {\n        return payload_ == nullptr;\n    }\n\n    std::size_t bytes() const noexcept\n    {\n        return payload_\n            ? payload_->bytes()\n            : 0;\n    }\n\n    const PacketStorage* payload() const noexcept\n    {\n        return payload_.get();\n    }\n\nprivate:\n    std::unique_ptr<PacketStorage> payload_;\n};",
+  "reference_solution": "#include <cstddef>\n#include <memory>\n#include <utility>\n\nclass UploadPacket\n{\npublic:\n    explicit UploadPacket(std::size_t bytes)\n        : payload_(\n            std::make_unique<PacketStorage>(bytes)\n        )\n    {\n    }\n\n    UploadPacket(const UploadPacket&) = delete;\n    UploadPacket& operator=(const UploadPacket&) = delete;\n\n    UploadPacket(UploadPacket&& other) noexcept\n        : payload_(std::move(other.payload_))\n    {\n    }\n\n    ~UploadPacket() = default;\n\n    bool empty() const noexcept\n    {\n        return payload_ == nullptr;\n    }\n\n    std::size_t bytes() const noexcept\n    {\n        return payload_\n            ? payload_->bytes()\n            : 0;\n    }\n\n    const PacketStorage* payload() const noexcept\n    {\n        return payload_.get();\n    }\n\nprivate:\n    std::unique_ptr<PacketStorage> payload_;\n};",
+  "expected_concepts": [
+    "move_constructor",
+    "exclusive_ownership",
+    "resource_identity",
+    "moved_from_state",
+    "noexcept"
+  ],
+  "concept_checks": [
+    {
+      "type": "move_constructor",
+      "class": "UploadPacket"
+    }
+  ],
+  "support_file": "support/packet_storage.hpp",
+  "analysis_support_file": "analysis_support/packet_storage_stub.hpp",
+  "hidden_test_file": "tests/move_runtime_trace_001_tests.cpp",
+  "trace_mode": "runtime",
+  "hints": [
+    "A correct move should not create another PacketStorage allocation.",
+    "The destination should own the exact payload object that the source owned before the move.",
+    "std::unique_ptr already has ownership-transfer behavior when it is moved."
+  ],
+  "explanation": "The broken constructor allocates a new PacketStorage and leaves the source owning the old one, so it behaves like a deep copy despite having a move-constructor signature. A correct move transfers the existing unique_ptr ownership. The destination keeps the original resource identity and the source becomes empty without a second payload allocation.",
+  "learner_goal": "Transfer a failed upload packet into retry handling without allocating a duplicate payload or leaving the original packet still owning its old payload."
+}

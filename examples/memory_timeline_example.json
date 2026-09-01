@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "exercise_id": "move_runtime_trace_001",
+  "timeline": [
+    {
+      "step": 3,
+      "cause": {
+        "type": "BIND_POINTER",
+        "subject": "source.data_",
+        "detail": "resource#1"
+      },
+      "stack": [
+        {
+          "name": "source",
+          "type": "Buffer",
+          "alive": true,
+          "fields": {
+            "data_": {
+              "kind": "pointer",
+              "points_to": "resource#1"
+            }
+          },
+          "lifetime": "alive"
+        }
+      ],
+      "heap": [
+        {
+          "id": "resource#1",
+          "alive": true,
+          "value": "42"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "cause": {
+        "type": "SET_NULL",
+        "subject": "source.data_",
+        "detail": "nullptr after move"
+      },
+      "stack": [
+        {
+          "name": "destination",
+          "type": "Buffer",
+          "alive": true,
+          "fields": {
+            "data_": {
+              "kind": "pointer",
+              "points_to": "resource#1"
+            }
+          },
+          "lifetime": "alive"
+        },
+        {
+          "name": "source",
+          "type": "Buffer",
+          "alive": true,
+          "fields": {
+            "data_": {
+              "kind": "pointer",
+              "points_to": null
+            }
+          },
+          "lifetime": "alive"
+        }
+      ],
+      "heap": [
+        {
+          "id": "resource#1",
+          "alive": true,
+          "value": "42"
+        }
+      ]
+    }
+  ]
+}

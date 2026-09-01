@@ -1,0 +1,127 @@
+{
+  "difficulty_profiles_version": 1,
+  "topics": {
+    "references": {
+      "summary": "Difficulty is based on how many distinct reference decisions the learner must reason about and how those decisions interact across functions.",
+      "easy": {
+        "learner_shape": "One or two local reference decisions. Each affected function has at most one learner-fixable reference parameter.",
+        "rules": {
+          "min_reference_decisions": 1,
+          "max_reference_decisions": 2,
+          "max_checks_per_function": 1,
+          "max_writable_functions": 1
+        }
+      },
+      "medium": {
+        "learner_shape": "Several const/non-const decisions, or multiple reference decisions inside one realistic API. Writable state is still concentrated in one primary mutation path.",
+        "rules": {
+          "min_reference_decisions": 2,
+          "require_one_of": [
+            "reference_decisions>=3",
+            "max_checks_per_function>=2"
+          ],
+          "max_writable_functions": 1
+        }
+      },
+      "hard": {
+        "learner_shape": "Multiple interacting reference decisions across functions, with caller-owned state mutated through at least two distinct function paths. This is more than adding '&' to one helper.",
+        "rules": {
+          "min_reference_decisions": 4,
+          "min_distinct_functions": 2,
+          "min_writable_functions": 2
+        }
+      }
+    },
+    "raii_scope": {
+      "summary": "Difficulty is based on how many resource lifetimes must change and whether the correct solution needs one cleanup boundary or multiple/nested lifetime boundaries.",
+      "easy": {
+        "learner_shape": "Exactly one resource declaration needs a narrower scope.",
+        "rules": {
+          "moved_scope_declarations": 1,
+          "max_target_scope_depth": 2
+        }
+      },
+      "medium": {
+        "learner_shape": "At least two resource declarations need coordinated lifetime changes, but they can share one cleanup boundary.",
+        "rules": {
+          "min_moved_scope_declarations": 2,
+          "max_target_scope_depth": 2,
+          "max_distinct_target_depths": 1
+        }
+      },
+      "hard": {
+        "learner_shape": "Several resources or nested/dependent lifetimes require multiple cleanup boundaries or deeper nesting.",
+        "rules": {
+          "min_moved_scope_declarations": 2,
+          "require_one_of": [
+            "moved_scope_declarations>=3",
+            "max_target_scope_depth>=3",
+            "distinct_target_depths>=2"
+          ]
+        }
+      }
+    },
+    "move_semantics": {
+      "summary": "Difficulty is based on how many ownership invariants must hold simultaneously during move construction.",
+      "easy": {
+        "learner_shape": "One exclusive resource and a small move bug with only a few ownership requirements.",
+        "rules": {
+          "max_advanced_invariants": 2
+        }
+      },
+      "medium": {
+        "learner_shape": "Several ownership/state invariants must be preserved, but the exercise does not require the full hard invariant set.",
+        "rules": {
+          "min_advanced_invariants": 3,
+          "max_advanced_invariants": 4
+        }
+      },
+      "hard": {
+        "learner_shape": "The move must simultaneously preserve resource identity, avoid replacement allocation, leave the source empty, remain noexcept, and preserve exclusive ownership/copy restrictions.",
+        "rules": {
+          "required_invariants": [
+            "noexcept_move",
+            "resource_identity",
+            "moved_from_state",
+            "no_duplicate_allocation",
+            "exclusive_ownership"
+          ]
+        }
+      }
+    },
+    "pointers": {
+      "summary": "Difficulty is based on the number of distinct raw-pointer relationships and whether the exercise combines dereference-based mutation, null/reseat state, aliasing, and pointee lifetime boundaries.",
+      "easy": {
+        "learner_shape": "One raw pointer tracks one live pointee. The learner makes one or two local pointer decisions with no aliasing or dangling-lifetime reasoning.",
+        "rules": {
+          "min_pointer_decisions": 1,
+          "max_pointer_decisions": 2,
+          "pointer_subjects": 1,
+          "max_writable_pointer_paths": 1,
+          "forbid_aliasing": true,
+          "forbid_lifetime_boundary": true
+        }
+      },
+      "medium": {
+        "learner_shape": "Several pointer-state decisions interact, such as null handling, reseating, multiple pointer subjects, or mutation through a pointer, while pointee lifetime remains safe.",
+        "rules": {
+          "min_pointer_decisions": 3,
+          "max_pointer_decisions": 5,
+          "forbid_hard_shape": true
+        }
+      },
+      "hard": {
+        "learner_shape": "Multiple raw pointers interact with aliasing and mutation while at least one pointee lifetime ends. The learner must avoid using a stale pointer and make the post-lifetime pointer state explicit.",
+        "rules": {
+          "min_pointer_decisions": 6,
+          "min_pointer_subjects": 2,
+          "require_aliasing": true,
+          "require_lifetime_boundary": true,
+          "min_writable_pointer_paths": 1,
+          "require_null_or_reseat": true,
+          "min_pointer_holder_objects": 2
+        }
+      }
+    }
+  }
+}

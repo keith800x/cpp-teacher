@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "C++ Teacher OpenAI Exercise Draft",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "exercise",
+    "artifacts"
+  ],
+  "properties": {
+    "exercise": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exercise_schema_version",
+        "id",
+        "topic",
+        "title",
+        "difficulty",
+        "type",
+        "scenario",
+        "problem_statement",
+        "constraints",
+        "learning_objective",
+        "learner_goal",
+        "instructions",
+        "starter_code",
+        "reference_solution",
+        "expected_concepts",
+        "concept_checks",
+        "hidden_test_file",
+        "support_file",
+        "analysis_support_file",
+        "trace_mode",
+        "hints",
+        "explanation"
+      ],
+      "properties": {
+        "exercise_schema_version": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "topic": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": [
+            "easy",
+            "medium",
+            "hard"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "fix_code",
+            "implement_code",
+            "debug_code"
+          ]
+        },
+        "scenario": {
+          "type": "string"
+        },
+        "problem_statement": {
+          "type": "string"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "learning_objective": {
+          "type": "string"
+        },
+        "instructions": {
+          "type": "string"
+        },
+        "starter_code": {
+          "type": "string"
+        },
+        "reference_solution": {
+          "type": "string"
+        },
+        "expected_concepts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "concept_checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "function",
+              "parameter",
+              "variable",
+              "argument",
+              "class"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "non_const_reference_parameter",
+                  "const_reference_parameter",
+                  "non_const_reference_variable",
+                  "const_reference_variable",
+                  "std_move_initializer",
+                  "virtual_destructor",
+                  "copy_constructor",
+                  "move_constructor"
+                ]
+              },
+              "function": {
+                "type": "string"
+              },
+              "parameter": {
+                "type": "string"
+              },
+              "variable": {
+                "type": "string"
+              },
+              "argument": {
+                "type": "string"
+              },
+              "class": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "hidden_test_file": {
+          "type": "string"
+        },
+        "support_file": {
+          "type": "string"
+        },
+        "analysis_support_file": {
+          "type": "string"
+        },
+        "trace_mode": {
+          "type": "string",
+          "enum": [
+            "runtime",
+            "runtime_derived_raii",
+            "source_pattern"
+          ]
+        },
+        "hints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "explanation": {
+          "type": "string"
+        },
+        "learner_goal": {
+          "type": "string"
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "path",
+          "content"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "hidden_test",
+              "support",
+              "analysis_support"
+            ]
+          },
+          "path": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

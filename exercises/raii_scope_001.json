@@ -1,0 +1,35 @@
+{
+  "exercise_schema_version": 1,
+  "id": "raii_scope_001",
+  "topic": "raii_scope",
+  "title": "Release Video Scratch Memory Before Upload",
+  "difficulty": "medium",
+  "type": "fix_code",
+  "scenario": "A video-processing worker runs processVideoFrame for each camera frame. It needs outputBuffer for the final upload, but decodeScratch and filterScratch are large temporary FrameBuffer objects used only during decodeFrame and applyFilter.",
+  "problem_statement": "processVideoFrame keeps decodeScratch and filterScratch alive until after uploadFrame(outputBuffer), even though neither scratch buffer is needed once decoding and filtering finish. Reorganize their lifetime so both temporary buffers are destroyed before uploadFrame runs while outputBuffer remains available.",
+  "constraints": [
+    "Preserve the decode-then-filter operation order.",
+    "Do not use new, delete, or explicit destructor calls.",
+    "Keep outputBuffer alive until uploadFrame(outputBuffer) has run."
+  ],
+  "learning_objective": "Match automatic object lifetime to the scope where a resource is actually needed, allowing RAII to release temporary memory early.",
+  "instructions": "Preserve the decode-then-filter-then-upload behavior. Change only object placement/lifetime so the two scratch buffers are released before uploadFrame(outputBuffer) starts.",
+  "starter_code": "void processVideoFrame()\n{\n    FrameBuffer outputBuffer(\"outputBuffer\", 1920, 1080);\n    FrameBuffer decodeScratch(\"decodeScratch\", 1920, 1080);\n    FrameBuffer filterScratch(\"filterScratch\", 1920, 1080);\n\n    {\n        decodeFrame(decodeScratch);\n        applyFilter(filterScratch);\n    }\n\n    uploadFrame(outputBuffer);\n}",
+  "reference_solution": "void processVideoFrame()\n{\n    FrameBuffer outputBuffer(\"outputBuffer\", 1920, 1080);\n\n    {\n        FrameBuffer decodeScratch(\"decodeScratch\", 1920, 1080);\n        FrameBuffer filterScratch(\"filterScratch\", 1920, 1080);\n\n        decodeFrame(decodeScratch);\n        applyFilter(filterScratch);\n    }\n\n    uploadFrame(outputBuffer);\n}",
+  "expected_concepts": [
+    "raii",
+    "automatic_storage_duration",
+    "lexical_scope",
+    "reverse_destruction_order"
+  ],
+  "support_file": "support/frame_buffer.hpp",
+  "hidden_test_file": "tests/raii_scope_001_tests.cpp",
+  "trace_mode": "runtime_derived_raii",
+  "hints": [
+    "The two scratch buffers should no longer exist when uploadFrame begins.",
+    "Automatic local objects are destroyed when execution leaves the block in which they were created.",
+    "You can change lifetime by changing where declarations are placed; explicit cleanup should not be necessary."
+  ],
+  "explanation": "Placing the scratch buffers inside the processing block ties their lifetime to that block. filterScratch is destroyed first, then decodeScratch, before uploadFrame executes. outputBuffer remains alive until the function ends.",
+  "learner_goal": "Release the two large scratch buffers as soon as decoding and filtering finish while keeping the final output buffer alive for upload."
+}

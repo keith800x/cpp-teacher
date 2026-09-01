@@ -1,0 +1,51 @@
+{
+  "exercise_schema_version": 1,
+  "id": "ai_move_semantics_20260828_101133_286f4d",
+  "topic": "move_semantics",
+  "title": "Hand Off a Field Supply Kit",
+  "difficulty": "easy",
+  "type": "fix_code",
+  "scenario": "A disaster-response depot sends a FieldKit from the loading crew to a medical station. Each kit contains a SupplyLoad with the number of packages ready for the station.",
+  "problem_statement": "FieldKit's move constructor currently makes a second SupplyLoad for the medical station, so the loading crew's FieldKit still reports packages after the handoff. Correct FieldKit so the station receives the packages and the original kit becomes empty.",
+  "constraints": [
+    "Keep the existing public API unchanged.",
+    "The receiving kit must report the package count held before the handoff.",
+    "After a handoff, the original kit must report that it is empty."
+  ],
+  "learning_objective": "Implement a move constructor that initializes a member by moving from the corresponding member of the source object, leaving the moved-from object in its valid empty state.",
+  "instructions": "Repair the handoff behavior in FieldKit. When the medical station constructs a kit from the loading crew's kit, the packages must arrive at the station and no longer remain in the loading crew's kit.",
+  "starter_code": "#include <utility>\n\nclass FieldKit\n{\npublic:\n    explicit FieldKit(int packages)\n        : load_(packages)\n    {\n    }\n\n    FieldKit(const FieldKit&) = delete;\n    FieldKit& operator=(const FieldKit&) = delete;\n\n    FieldKit(FieldKit&& other)\n        : load_(other.load_)\n    {\n    }\n\n    ~FieldKit() = default;\n\n    bool empty() const\n    {\n        return load_.packages() == 0;\n    }\n\n    int packages() const\n    {\n        return load_.packages();\n    }\n\nprivate:\n    SupplyLoad load_;\n};\n",
+  "reference_solution": "#include <utility>\n\nclass FieldKit\n{\npublic:\n    explicit FieldKit(int packages)\n        : load_(packages)\n    {\n    }\n\n    FieldKit(const FieldKit&) = delete;\n    FieldKit& operator=(const FieldKit&) = delete;\n\n    FieldKit(FieldKit&& other)\n        : load_(std::move(other.load_))\n    {\n    }\n\n    ~FieldKit() = default;\n\n    bool empty() const\n    {\n        return load_.packages() == 0;\n    }\n\n    int packages() const\n    {\n        return load_.packages();\n    }\n\nprivate:\n    SupplyLoad load_;\n};\n",
+  "expected_concepts": [
+    "move_constructor"
+  ],
+  "concept_checks": [
+    {
+      "type": "move_constructor",
+      "function": "FieldKit",
+      "parameter": "other",
+      "variable": "load_",
+      "argument": "other.load_",
+      "class": "FieldKit"
+    },
+    {
+      "type": "std_move_initializer",
+      "function": "FieldKit",
+      "parameter": "other",
+      "variable": "load_",
+      "argument": "other.load_",
+      "class": "FieldKit"
+    }
+  ],
+  "hidden_test_file": "tests/ai_move_semantics_20260828_101133_286f4d_tests.cpp",
+  "support_file": "support/ai_move_semantics_20260828_101133_286f4d_support.hpp",
+  "analysis_support_file": "analysis_support/ai_move_semantics_20260828_101133_286f4d_analysis_stub.hpp",
+  "trace_mode": "runtime",
+  "hints": [
+    "Inspect how the constructor initializes load_.",
+    "SupplyLoad has different behavior when it is initialized from an object that is being handed off.",
+    "Check both kits after the receiving FieldKit has been created."
+  ],
+  "explanation": "The original constructor initializes load_ from other.load_ as an ordinary existing object, so SupplyLoad preserves the package count in both kits. Initializing the destination member as a handoff lets SupplyLoad transfer its package count and clear the source load. The receiving kit keeps the packages while the original kit becomes empty.",
+  "learner_goal": "Make a supply-kit handoff preserve the package count at the medical station and leave the loading crew's kit empty."
+}

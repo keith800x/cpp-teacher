@@ -1,0 +1,30 @@
+{
+  "id": "const_reference_001",
+  "topic": "const",
+  "title": "Read Through a Const Reference",
+  "difficulty": 2,
+  "type": "implement_function",
+  "learning_objective": "Use a const lvalue reference when a function should read an object without copying or modifying it.",
+  "instructions": "Fix readValue so its parameter is a const lvalue reference. Submit only the function; do not add main().",
+  "starter_code": "int readValue(int value)\n{\n    return value;\n}",
+  "reference_solution": "int readValue(const int& value)\n{\n    return value;\n}",
+  "expected_concepts": [
+    "const",
+    "references",
+    "const_reference"
+  ],
+  "concept_checks": [
+    {
+      "type": "const_reference_parameter",
+      "function": "readValue",
+      "parameter": "value"
+    }
+  ],
+  "hidden_test_file": "tests/const_reference_001_tests.cpp",
+  "hints": [
+    "The function should not copy the integer parameter.",
+    "The parameter should be a reference that cannot modify the caller's value.",
+    "Combine const with an lvalue reference."
+  ],
+  "explanation": "A const lvalue reference aliases an existing object while preventing modification through that reference."
+}

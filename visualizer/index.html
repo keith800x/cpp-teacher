@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>C++ Teacher</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="app-header simplified-header">
+        <div>
+            <p class="eyebrow">C++ TEACHER</p>
+            <h1>C++ Teacher</h1>
+            <p class="subtitle">
+                Solve realistic C++ problems, get compiler-backed feedback,
+                and visualize what your code does behind the scenes.
+            </p>
+        </div>
+    </header>
+
+    <main>
+        <section id="libraryView" class="exercise-library-view">
+            <section class="library-hero">
+                <div>
+                    <p class="eyebrow">EXERCISES</p>
+                    <h2>Practice C++ through real problems</h2>
+                    <p>
+                        Filter by topic and difficulty. Each exercise can produce
+                        a memory/lifetime visualization from your submission.
+                    </p>
+                </div>
+
+                <div class="library-hero-actions">
+                    <button
+                        id="openAuthoringButton"
+                        class="primary-button"
+                        type="button"
+                    >
+                        AI Authoring
+                    </button>
+                    <span class="authoring-short-note">
+                        Generate, validate, publish, or unpublish exercises locally.
+                    </span>
+                </div>
+
+                <div class="library-stats">
+                    <div>
+                        <span class="label">Available</span>
+                        <strong id="availableCount">0</strong>
+                    </div>
+                    <div>
+                        <span class="label">Solved</span>
+                        <strong id="solvedCount">0</strong>
+                    </div>
+                    <div>
+                        <span class="label">Attempted</span>
+                        <strong id="attemptedCount">0</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="exercise-filter-panel">
+                <label class="filter-field search-field">
+                    <span class="label">Search</span>
+                    <input
+                        id="exerciseSearch"
+                        type="search"
+                        placeholder="Search exercises..."
+                    >
+                </label>
+
+                <label class="filter-field">
+                    <span class="label">Topic</span>
+                    <select id="topicFilter">
+                        <option value="all">All topics</option>
+                    </select>
+                </label>
+
+                <label class="filter-field">
+                    <span class="label">Difficulty</span>
+                    <select id="difficultyFilter">
+                        <option value="all">All difficulties</option>
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </label>
+
+                <label class="filter-field">
+                    <span class="label">Status</span>
+                    <select id="statusFilter">
+                        <option value="all">All statuses</option>
+                        <option value="unsolved">Unsolved</option>
+                        <option value="attempted">Attempted</option>
+                        <option value="solved">Solved</option>
+                    </select>
+                </label>
+
+                <button
+                    id="clearFiltersButton"
+                    class="file-button filter-reset"
+                    type="button"
+                >
+                    Clear filters
+                </button>
+            </section>
+
+            <div class="library-result-row">
+                <strong id="libraryResultCount">0 exercises</strong>
+                <span id="libraryFilterSummary">Showing all exercises</span>
+            </div>
+
+            <section id="exerciseCards" class="exercise-card-grid">
+                <div class="status-panel">
+                    Loading exercises…
+                </div>
+            </section>
+        </section>
+
+        <section id="authoringView" class="authoring-view hidden">
+            <div class="workspace-toolbar">
+                <button
+                    id="backFromAuthoringButton"
+                    class="back-button"
+                    type="button"
+                >
+                    ← Back to exercises
+                </button>
+
+                <span id="authoringEnvironmentStatus" class="authoring-environment-status">
+                    Loading authoring environment…
+                </span>
+            </div>
+
+            <section class="authoring-shell">
+                <header class="authoring-heading">
+                    <div>
+                        <p class="eyebrow">AUTHORING</p>
+                        <h2>AI Exercise Studio</h2>
+                        <p>
+                            Generate candidates, run the deterministic validator,
+                            inspect results, and publish only exercises that pass.
+                        </p>
+                    </div>
+                </header>
+
+                <section class="authoring-generate-panel">
+                    <div class="authoring-form-grid">
+                        <label class="filter-field">
+                            <span class="label">Topic</span>
+                            <select id="authoringTopic"></select>
+                        </label>
+
+                        <label class="filter-field">
+                            <span class="label">Difficulty</span>
+                            <select id="authoringDifficulty">
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </label>
+
+                        <label class="filter-field">
+                            <span class="label">Model</span>
+                            <input
+                                id="authoringModel"
+                                type="text"
+                                placeholder="Use server default"
+                            >
+                        </label>
+
+                        <label class="filter-field">
+                            <span class="label">Repair attempts</span>
+                            <select id="authoringRepairs">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2" selected>2</option>
+                                <option value="3">3</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="authoring-generate-actions">
+                        <button
+                            id="generateExerciseButton"
+                            class="primary-button"
+                            type="button"
+                        >
+                            Generate &amp; Validate
+                        </button>
+                        <span id="generationStatus" class="authoring-status-text">
+                            Ready.
+                        </span>
+                    </div>
+
+                    <pre id="generationLog" class="authoring-log hidden"></pre>
+                </section>
+
+                <section class="authoring-section">
+                    <div class="authoring-section-heading">
+                        <div>
+                            <span class="label">Candidates</span>
+                            <h3>Generated candidates</h3>
+                        </div>
+                        <button
+                            id="refreshAuthoringButton"
+                            class="file-button"
+                            type="button"
+                        >
+                            Refresh
+                        </button>
+                    </div>
+                    <div id="authoringCandidates" class="authoring-card-list"></div>
+                </section>
+
+                <section class="authoring-section">
+                    <div class="authoring-section-heading">
+                        <div>
+                            <span class="label">Library management</span>
+                            <h3>Published exercises</h3>
+                        </div>
+                    </div>
+                    <p class="authoring-help">
+                        Unpublish removes an exercise from the library but keeps its
+                        source files and saved progress by default. AI candidates can be
+                        published again later.
+                    </p>
+                    <div id="publishedExerciseList" class="authoring-card-list"></div>
+                </section>
+            </section>
+        </section>
+
+        <section id="exerciseView" class="exercise-view hidden">
+            <div class="workspace-toolbar">
+                <button
+                    id="backToLibraryButton"
+                    class="back-button"
+                    type="button"
+                >
+                    ← Back to exercises
+                </button>
+
+                <div class="workspace-badges">
+                    <span id="exerciseTopicBadge" class="topic-badge">—</span>
+                    <span id="exerciseDifficultyBadge" class="difficulty-badge">—</span>
+                </div>
+            </div>
+
+            <section class="exercise-shell">
+                <header class="exercise-heading-panel">
+                    <div>
+                        <p class="eyebrow">EXERCISE</p>
+                        <h2 id="exerciseTitle">Choose an exercise</h2>
+                        <p id="exerciseObjective" class="exercise-objective">
+                            Return to the exercise library to choose a problem.
+                        </p>
+                    </div>
+
+                    <div class="exercise-heading-actions">
+                        <button
+                            id="resetStarterButton"
+                            class="file-button"
+                            type="button"
+                            disabled
+                        >
+                            Reset starter
+                        </button>
+
+                        <button
+                            id="runGradeButton"
+                            class="primary-button"
+                            type="button"
+                            disabled
+                        >
+                            Run &amp; Grade
+                        </button>
+                    </div>
+                </header>
+
+                <div class="exercise-layout">
+                    <section class="editor-panel">
+                        <div class="panel-heading-row">
+                            <div>
+                                <span class="label">C++ solution</span>
+                                <p class="panel-helper">
+                                    Solve the stated problem using normal C++.
+                                    Do not type END.
+                                </p>
+                            </div>
+
+                            <span id="editorStatus" class="editor-status">
+                                No exercise loaded
+                            </span>
+                        </div>
+
+                        <div class="code-editor-shell">
+                            <pre
+                                id="lineNumbers"
+                                class="line-numbers"
+                                aria-hidden="true"
+                            >1</pre>
+
+                            <textarea
+                                id="codeEditor"
+                                class="code-editor"
+                                spellcheck="false"
+                                autocomplete="off"
+                                autocapitalize="off"
+                                disabled
+                            ></textarea>
+                        </div>
+
+                        <p class="editor-shortcut">
+                            Tip: press Ctrl+Enter (or Cmd+Enter) to Run &amp; Grade.
+                        </p>
+                    </section>
+
+                    <aside class="exercise-guide-panel">
+                        <section>
+                            <span class="label">Scenario</span>
+                            <p id="exerciseScenario" class="exercise-primary-copy">
+                                Select an exercise from the library.
+                            </p>
+                        </section>
+
+                        <section>
+                            <span class="label">Problem</span>
+                            <p id="exerciseProblem" class="exercise-primary-copy">
+                                Select an exercise from the library.
+                            </p>
+                        </section>
+
+                        <section>
+                            <span class="label">Requirements</span>
+                            <p id="exerciseInstructions" class="exercise-requirements-copy">
+                                Select an exercise from the library.
+                            </p>
+                        </section>
+
+                        <section>
+                            <div class="hint-heading-row">
+                                <span class="label">Hints</span>
+                                <button
+                                    id="revealHintButton"
+                                    class="hint-button"
+                                    type="button"
+                                    disabled
+                                >
+                                    Reveal a hint
+                                </button>
+                            </div>
+
+                            <ol id="exerciseHints" class="exercise-hints"></ol>
+
+                            <p id="hintStatus" class="hint-status">
+                                Hints are hidden until you request one.
+                            </p>
+                        </section>
+                    </aside>
+                </div>
+
+                <section class="grade-panel">
+                    <div class="panel-heading-row">
+                        <div>
+                            <span class="label">Grading result</span>
+                            <strong id="gradeSummary">Not run yet</strong>
+                        </div>
+
+                        <button
+                            id="openLatestVisualizationButton"
+                            class="lesson-button"
+                            type="button"
+                            disabled
+                        >
+                            Visualize this attempt
+                        </button>
+                    </div>
+
+                    <div id="gradeStages" class="grade-stages">
+                        <div class="grade-empty-state">
+                            Run your solution to see structured grading stages.
+                        </div>
+                    </div>
+
+                    <details class="raw-grade-details">
+                        <summary>Raw structured report</summary>
+                        <pre id="gradeOutput" class="grade-output">{}</pre>
+                    </details>
+                </section>
+
+                <section id="solutionPanel" class="solution-panel">
+                    <div class="solution-header">
+                        <div>
+                            <span class="label">Reference solution</span>
+                            <strong id="solutionLockBadge" class="solution-lock-badge locked">
+                                Locked
+                            </strong>
+                        </div>
+
+                        <button
+                            id="viewSolutionButton"
+                            class="lesson-button"
+                            type="button"
+                            disabled
+                        >
+                            View solution
+                        </button>
+                    </div>
+
+                    <p id="solutionMessage" class="solution-message">
+                        The reference solution unlocks after at least one failed attempt.
+                    </p>
+
+                    <div id="solutionContent" class="solution-content hidden">
+                        <section>
+                            <span class="label">Solution code</span>
+                            <pre id="solutionCode" class="solution-code"></pre>
+                        </section>
+
+                        <section>
+                            <span class="label">Why it works</span>
+                            <p id="solutionExplanation" class="solution-explanation"></p>
+                        </section>
+
+                        <button
+                            id="visualizeSolutionButton"
+                            class="primary-button"
+                            type="button"
+                        >
+                            Visualize solution
+                        </button>
+                    </div>
+                </section>
+            </section>
+        </section>
+
+        <section id="visualizerView" class="visualizer-view hidden">
+            <div class="workspace-toolbar">
+                <button
+                    id="backToExerciseButton"
+                    class="back-button"
+                    type="button"
+                >
+                    ← Back to exercise
+                </button>
+
+                <div class="visualization-toolbar-right">
+                    <div>
+                        <span class="label">Visualization for</span>
+                        <strong id="visualizationExerciseTitle">Current exercise</strong>
+                    </div>
+
+                    <div
+                        id="visualizationExportActions"
+                        class="visualization-export-actions"
+                    >
+                        <button
+                            id="downloadVisualizationDataButton"
+                            class="file-button"
+                            type="button"
+                            title="Download the full timeline JSON"
+                        >
+                            Data JSON
+                        </button>
+
+                        <button
+                            id="downloadVisualizationSnapshotButton"
+                            class="file-button"
+                            type="button"
+                            title="Download the current snapshot as an SVG"
+                        >
+                            Snapshot SVG
+                        </button>
+
+                        <button
+                            id="downloadVisualizationAllButton"
+                            class="file-button"
+                            type="button"
+                            title="Download all SVG snapshots plus timeline data in one ZIP"
+                        >
+                            All snapshots ZIP
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <section id="statusPanel" class="status-panel">
+                <strong>Waiting for a visualization.</strong>
+                <span>
+                    Run an exercise first, then visualize that attempt.
+                </span>
+            </section>
+
+            <section id="visualizerApp" class="visualizer hidden">
+                <div class="timeline-header">
+                    <div>
+                        <span class="label">Exercise</span>
+                        <strong id="exerciseId">—</strong>
+                    </div>
+
+                    <div>
+                        <span class="label">Schema</span>
+                        <strong id="schemaVersion">—</strong>
+                    </div>
+
+                    <div class="step-counter">
+                        <span class="label">Snapshot</span>
+                        <strong>
+                            <span id="currentStep">0</span>
+                            /
+                            <span id="totalSteps">0</span>
+                        </strong>
+                    </div>
+                </div>
+
+                <section class="event-card">
+                    <div class="event-type" id="eventType">—</div>
+
+                    <div>
+                        <h2 id="eventSubject">—</h2>
+                        <p id="eventDetail">—</p>
+                    </div>
+                </section>
+
+                <section class="memory-stage" id="memoryStage">
+                    <svg
+                        id="arrowLayer"
+                        class="arrow-layer"
+                        aria-hidden="true"
+                    >
+                        <defs>
+                            <marker
+                                id="arrowHead"
+                                markerWidth="10"
+                                markerHeight="10"
+                                refX="9"
+                                refY="3"
+                                orient="auto"
+                                markerUnits="strokeWidth"
+                            >
+                                <path
+                                    d="M0,0 L0,6 L9,3 z"
+                                    class="arrow-head"
+                                />
+                            </marker>
+                        </defs>
+                    </svg>
+
+                    <section class="memory-column stack-column">
+                        <div class="column-title">
+                            <span class="memory-icon">S</span>
+                            <div>
+                                <h2>Stack</h2>
+                                <p>Local objects and pointer fields</p>
+                            </div>
+                        </div>
+
+                        <div class="scope-panel">
+                            <span class="label">Active scopes</span>
+                            <div id="activeScopes" class="scope-path"></div>
+                        </div>
+
+                        <section class="stack-subsection">
+                            <div class="subsection-title">Stack storage</div>
+                            <div id="stackValues" class="memory-list compact-list"></div>
+                        </section>
+
+                        <section class="stack-subsection">
+                            <div class="subsection-title">References / aliases</div>
+                            <div id="stackAliases" class="memory-list compact-list"></div>
+                        </section>
+
+                        <section class="stack-subsection" id="objectSection">
+                            <div class="subsection-title">Objects</div>
+                            <div id="stackObjects" class="memory-list"></div>
+                        </section>
+                    </section>
+
+                    <section class="memory-column heap-column">
+                        <div class="column-title">
+                            <span class="memory-icon heap-icon">H</span>
+                            <div>
+                                <h2>Heap</h2>
+                                <p>Dynamically allocated resources</p>
+                            </div>
+                        </div>
+
+                        <div id="heapResources" class="memory-list"></div>
+                    </section>
+                </section>
+
+                <section class="timeline-controls">
+                    <button id="previousButton" class="nav-button">
+                        ← Previous
+                    </button>
+
+                    <button id="playButton" class="nav-button play-button">
+                        ▶ Play
+                    </button>
+
+                    <input
+                        id="timelineSlider"
+                        class="timeline-slider"
+                        type="range"
+                        min="0"
+                        max="0"
+                        value="0"
+                    >
+
+                    <button id="nextButton" class="nav-button">
+                        Next →
+                    </button>
+                </section>
+
+                <section class="teaching-note">
+                    <strong id="teachingTitle">What changed?</strong>
+                    <p id="teachingText">
+                        Select a timeline frame to inspect the memory state.
+                    </p>
+                </section>
+            </section>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+    <script src="pointer_visualizer.js?v=30.7.1"></script>
+    <script src="raii_visualizer.js?v=30.7.6"></script>
+    <script src="move_visualizer.js?v=30.8.2"></script>
+    <script src="visualization_export.js?v=30.8.2"></script>
+    <script src="authoring.js"></script>
+</body>
+</html>

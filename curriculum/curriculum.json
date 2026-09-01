@@ -1,0 +1,100 @@
+{
+  "curriculum_version": 1,
+  "title": "C++ Foundations: Lifetime, Ownership, and References",
+  "description": "Learn core C++ semantics through theory, compiler-backed exercises, runtime traces, and memory visualizations.",
+  "lessons": [
+    {
+      "order": 1,
+      "exercise_id": "references_alias_001",
+      "topic": "References",
+      "title": "Update Warehouse Stock Without Creating Stale Copies",
+      "difficulty": 2,
+      "exercise_file": "exercises/references_alias_001.json",
+      "theory": [
+        "Passing by value creates an independent parameter object.",
+        "A non-const lvalue reference parameter can update caller-owned state.",
+        "A const lvalue reference can inspect an existing object without copying or allowing writes through that parameter."
+      ],
+      "objectives": [
+        "Diagnose a bug caused by pass-by-value.",
+        "Choose a writable reference parameter for caller-owned state.",
+        "Use a const reference for read-only access to an existing std::string.",
+        "Visualize the difference between a parameter copy and an alias."
+      ]
+    },
+    {
+      "order": 2,
+      "exercise_id": "move_runtime_trace_001",
+      "topic": "Move Semantics",
+      "title": "Transfer Upload Payload Ownership Without Duplicating Memory",
+      "difficulty": 3,
+      "exercise_file": "exercises/move_runtime_trace_001.json",
+      "theory": [
+        "Move construction transfers ownership/state from an object that is about to give up its resources.",
+        "A true ownership transfer should preserve the original resource identity instead of allocating a replacement.",
+        "Moved-from objects must remain valid, and noexcept move construction is important for standard-library container behavior."
+      ],
+      "objectives": [
+        "Diagnose a move constructor that secretly duplicates an allocation.",
+        "Transfer exclusive ownership without making a second payload.",
+        "Leave the moved-from UploadPacket valid and empty.",
+        "Verify both noexcept syntax and runtime resource identity."
+      ]
+    },
+    {
+      "order": 3,
+      "exercise_id": "raii_scope_001",
+      "topic": "RAII and Scope",
+      "title": "Release Video Scratch Memory Before Upload",
+      "difficulty": 2,
+      "exercise_file": "exercises/raii_scope_001.json",
+      "theory": [
+        "Automatic objects release their resources when their lexical scope ends.",
+        "Temporary resources should usually live in the narrowest scope that needs them.",
+        "Objects in one scope are destroyed in reverse construction order."
+      ],
+      "objectives": [
+        "Recognize temporary resources whose lifetime is unnecessarily long.",
+        "Use a nested block to release scratch buffers before later work.",
+        "Predict reverse destruction order.",
+        "Observe hidden constructor/destructor instrumentation without adding tracing code to the solution."
+      ]
+    },
+    {
+      "order": 4,
+      "exercise_id": "unique_ptr_ast_001",
+      "topic": "Smart Pointers",
+      "title": "unique_ptr Ownership Transfer",
+      "difficulty": 2,
+      "exercise_file": "exercises/unique_ptr_ast_001.json",
+      "theory": [
+        "std::unique_ptr represents exclusive ownership.",
+        "Copying a unique_ptr is disabled because two unique owners would violate the ownership model.",
+        "std::move enables ownership to be transferred to another unique_ptr."
+      ],
+      "objectives": [
+        "Explain exclusive ownership.",
+        "Use std::move to transfer a unique_ptr.",
+        "Visualize the source becoming empty after transfer."
+      ],
+      "planned": true
+    },
+    {
+      "order": 5,
+      "exercise_id": "virtual_destructor_001",
+      "topic": "Polymorphism",
+      "title": "Virtual Destructors",
+      "difficulty": 3,
+      "exercise_file": "exercises/virtual_destructor_001.json",
+      "theory": [
+        "Deleting a derived object through a base pointer requires a virtual base destructor for correct polymorphic destruction.",
+        "A class can have other virtual functions while still having a non-virtual destructor."
+      ],
+      "objectives": [
+        "Recognize when a base destructor should be virtual.",
+        "Verify the destructor semantically with Clang AST."
+      ],
+      "planned": true
+    }
+  ]
+}

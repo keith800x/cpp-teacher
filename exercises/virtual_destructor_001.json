@@ -1,0 +1,28 @@
+{
+  "id": "virtual_destructor_001",
+  "topic": "virtual_destructors",
+  "title": "Make the Base Destructor Virtual",
+  "difficulty": 2,
+  "type": "fix_code",
+  "learning_objective": "Recognize when a polymorphic base class intended for deletion through a base pointer needs a virtual destructor.",
+  "instructions": "Entity is a polymorphic base class with a public destructor. Fix Entity so deleting a derived object through an Entity pointer is supported correctly. Submit the complete program.",
+  "starter_code": "class Entity\n{\npublic:\n    virtual void update()\n    {\n    }\n\n    ~Entity() = default;\n};\n\nclass Player : public Entity\n{\npublic:\n    void update() override\n    {\n    }\n};\n\nint main()\n{\n    return 0;\n}",
+  "reference_solution": "class Entity\n{\npublic:\n    virtual void update()\n    {\n    }\n\n    virtual ~Entity() = default;\n};\n\nclass Player : public Entity\n{\npublic:\n    void update() override\n    {\n    }\n};\n\nint main()\n{\n    return 0;\n}",
+  "expected_concepts": [
+    "virtual_destructor",
+    "polymorphism",
+    "base_class_lifetime"
+  ],
+  "concept_checks": [
+    {
+      "type": "virtual_destructor",
+      "class": "Entity"
+    }
+  ],
+  "hints": [
+    "Entity already has a virtual member function, so it is being used polymorphically.",
+    "A public base destructor used for polymorphic deletion should be virtual.",
+    "Add virtual to Entity's destructor declaration."
+  ],
+  "explanation": "When an object may be deleted through a pointer to a polymorphic base class, the base destructor must be virtual so destruction dispatches to the derived destructor first. The analyzer verifies Clang's CXXDestructorDecl for Entity is actually virtual."
+}
